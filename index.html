@@ -210,6 +210,34 @@ function run(){
                 </svg>
             </div>
             `;
+
+            // NAME
+            const han = {
+"상": [
+"  ***   *****   ***  ",
+" *****  *****  ***** ",
+"  * *   *   *   * *  ",
+" *****  *****  ***** ",
+"  ***   *   *   ***  "
+],
+"엽": [
+" *****   *****  ***** ",
+" *      *      *   *  ",
+" *****   *****   ***  ",
+" *          *      *   ",
+" *****   *****  ***** "
+]
+};
+
+function printChar(char){
+    han[char].forEach(line => {
+        out.innerText += line + "\n";
+    });
+    out.innerText += "\n";
+}
+
+printChar("상");
+printChar("엽");
         }
 
     }, 200);
