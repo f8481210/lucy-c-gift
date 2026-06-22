@@ -326,7 +326,7 @@ let beatDuration = 60 / currentBpm;
 let selectedFeedbacks = {}; 
 
 // 🌟 移到最頂層：全域的 Google Apps Script 計數器部署網址
-const GAS_COUNTER_URL = "https://script.google.com/macros/s/AKfycbwKCE1UTZUWRWjAk0kqcOkT1A3YqxOmpICQJj6tm2sE7AuppURd470aS3epOw3xfWnG/exec";
+const GAS_COUNTER_URL = "https://script.google.com/macros/s/AKfycbwTb-29jZnzFwvgLg20AGgwX48SmpcjSmGdetNhyT0c96OJQjziBE-Iw8_vcw-ZcKYA/exec";
 
 const NOTES = {
     C3: 130.81, D3: 146.83, E3: 164.81, F3: 174.61, G3: 196.00, A3: 220.00, B3: 246.94,
@@ -392,7 +392,7 @@ function checkFeedbackDraftStatus() {
     if (hasComment || hasSelected) {
         document.getElementById("runBtn").disabled = true;
         document.getElementById("fbStatus").style.color = "#ff4a4a"; 
-        document.getElementById("fbStatus").innerText = "⚠️ 작성 중인 피드백이 있습니다. 먼저 '피드백 보내기'를 눌러주세요! (請先點選送出回饋唷！)";
+        document.getElementById("fbStatus").innerText = "⚠️ 작성 중인 피드백이 있습니다. 먼저 '피드백 보내기'를 눌러주세요!";
         
         window.onbeforeunload = function() { return "變更尚未儲存"; };
     } else {
@@ -408,7 +408,7 @@ function submitAllFeedback() {
     const valuesArray = Object.values(selectedFeedbacks);
     if(valuesArray.length === 0) {
         document.getElementById("fbStatus").style.color = "#ff4a4a";
-        document.getElementById("fbStatus").innerText = "⚠️ 피드백을 최소 하나 이상 선택해 주세요! (請至少選擇一項回饋)";
+        document.getElementById("fbStatus").innerText = "⚠️ 피드백을 최소 하나 이상 선택해 주세요!";
         return;
     }
     const combinedFeedbackText = valuesArray.join(', ');
@@ -417,7 +417,7 @@ function submitAllFeedback() {
     if(!commentText) commentText = "(無留言)";
 
     document.getElementById("fbStatus").style.color = "#00ffcc";
-    document.getElementById("fbStatus").innerText = "선택이 완료되었습니다! 고마워요 오빠 ❤️";
+    document.getElementById("fbStatus").innerText = "선택이 완료되었습니다!";
 
     const currentV = document.getElementById("v").innerText;
     const currentR = document.getElementById("r").innerText;
