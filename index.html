@@ -45,7 +45,8 @@ canvas {
     background:#111;
     border-radius:12px;
     width:100%;
-    max-width:700px;
+    max-width:420px;
+    aspect-ratio: 3 / 4;
     border:1px solid #333;
 }
 
@@ -91,10 +92,8 @@ void heart();
 void message();
 
 int main() {
-
     heart();
     message();
-
     return 0;
 }
 
@@ -114,7 +113,6 @@ void message() {
     printf("음악 덕분에 행복했어요.\n");
     printf("또 만나요 ❤️\n");
 }
-
 </pre>
 
 <button onclick="run()">실행</button>
@@ -168,13 +166,20 @@ function addView(){
 }
 
 /////////////////////////////////////////////////
+// ANIMATION STATE
+/////////////////////////////////////////////////
+
+let animFrame = 0;
+let playing = false;
+
+/////////////////////////////////////////////////
 // DRAWING ENGINE
 /////////////////////////////////////////////////
 
 function drawGuitar(ctx, w, h) {
 
     ctx.strokeStyle = "#fff";
-    ctx.lineWidth = 4;
+    ctx.lineWidth = 3;
 
     // neck
     ctx.beginPath();
@@ -190,50 +195,43 @@ function drawGuitar(ctx, w, h) {
     ctx.beginPath();
     ctx.moveTo(w * 0.45, h * 0.55);
 
-    ctx.quadraticCurveTo(w * 0.35, h * 0.60, w * 0.40, h * 0.70);
-    ctx.quadraticCurveTo(w * 0.30, h * 0.85, w * 0.50, h * 0.88);
-    ctx.quadraticCurveTo(w * 0.70, h * 0.85, w * 0.60, h * 0.70);
-    ctx.quadraticCurveTo(w * 0.65, h * 0.60, w * 0.55, h * 0.55);
+    ctx.quadraticCurveTo(w * 0.32, h * 0.62, w * 0.40, h * 0.72);
+    ctx.quadraticCurveTo(w * 0.28, h * 0.86, w * 0.50, h * 0.90);
+    ctx.quadraticCurveTo(w * 0.72, h * 0.86, w * 0.60, h * 0.72);
+    ctx.quadraticCurveTo(w * 0.68, h * 0.62, w * 0.55, h * 0.55);
 
     ctx.closePath();
     ctx.stroke();
 
     // sound hole
     ctx.beginPath();
-    ctx.arc(w * 0.5, h * 0.72, w * 0.06, 0, Math.PI * 2);
-    ctx.stroke();
-}
-
-function drawMic(ctx, w, h) {
-
-    ctx.strokeStyle = "#fff";
-    ctx.lineWidth = 4;
-
-    // mic head
-    ctx.beginPath();
-    ctx.arc(w * 0.5, h * 0.15, w * 0.07, 0, Math.PI * 2);
+    ctx.arc(w * 0.5, h * 0.75, w * 0.06, 0, Math.PI * 2);
     ctx.stroke();
 
-    // body
-    ctx.beginPath();
-    ctx.moveTo(w * 0.5, h * 0.22);
-    ctx.lineTo(w * 0.5, h * 0.55);
-    ctx.stroke();
+    // 🎸 strings (animated)
+    const baseY = h * 0.58;
 
-    // stand
-    ctx.beginPath();
-    ctx.moveTo(w * 0.5, h * 0.55);
-    ctx.lineTo(w * 0.35, h * 0.85);
-    ctx.stroke();
+    for (let i = 0; i < 5; i++) {
 
-    ctx.beginPath();
-    ctx.moveTo(w * 0.5, h * 0.55);
-    ctx.lineTo(w * 0.65, h * 0.85);
-    ctx.stroke();
+        const offset = playing ? Math.sin(animFrame * 0.35 + i) * 4 : 0;
+
+        ctx.beginPath();
+        ctx.moveTo(w * 0.48, baseY + i * 8);
+        ctx.lineTo(w * 0.58, h * 0.12 + i * 8 + offset);
+        ctx.stroke();
+    }
+
+    // glow when playing
+    if (playing) {
+        ctx.fillStyle = "rgba(255,255,255,0.06)";
+        ctx.beginPath();
+        ctx.arc(w * 0.5, h * 0.75, w * 0.28, 0, Math.PI * 2);
+        ctx.fill();
+    }
 }
 
 /////////////////////////////////////////////////
-// RUN
+// RUN (ANIMATION)
 /////////////////////////////////////////////////
 
 function run(){
@@ -246,26 +244,35 @@ function run(){
     const canvas = document.getElementById("art");
     const ctx = canvas.getContext("2d");
 
-    const size = Math.min(window.innerWidth * 0.8, 600);
+    const w = Math.min(window.innerWidth * 0.8, 420);
+    const h = w * 1.3;
 
-    canvas.width = size;
-    canvas.height = size;
-
-    ctx.clearRect(0, 0, size, size);
+    canvas.width = w;
+    canvas.height = h;
 
     const out = document.getElementById("output");
-    out.innerHTML = "rendering...";
+    out.innerHTML = "playing... 🎸";
 
-    setTimeout(() => {
+    playing = true;
+    animFrame = 0;
 
-        ctx.clearRect(0, 0, size, size);
+    function animate(){
 
-        drawGuitar(ctx, size, size);
-        drawMic(ctx, size, size);
+        ctx.clearRect(0, 0, w, h);
 
-        out.innerHTML = "done.";
+        drawGuitar(ctx, w, h);
 
-    }, 300);
+        animFrame++;
+
+        if (animFrame < 45) {
+            requestAnimationFrame(animate);
+        } else {
+            playing = false;
+            out.innerHTML = "done.";
+        }
+    }
+
+    animate();
 }
 
 /////////////////////////////////////////////////
