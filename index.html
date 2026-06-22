@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>20260623 — 상엽에게</title>
+<title>20260623 — gift</title>
 
 <style>
 body {
@@ -19,6 +19,7 @@ pre {
     text-align:left;
     overflow-x:auto;
     border-radius:8px;
+    white-space:pre;
 }
 
 button {
@@ -29,8 +30,9 @@ button {
 
 #output {
     margin-top:20px;
-    white-space:pre-line;
     min-height:200px;
+    text-align:left;
+    white-space:pre;
 }
 
 .small { color:#aaa; }
@@ -65,40 +67,16 @@ font-family:monospace;
 <div style="margin-top:10px;color:#aaa;">loading gift system</div>
 </div>
 
-<h2>🎁 20260623 — 상엽에게</h2>
-<p class="small">C 언어 선물 프로그램</p>
+<h2>🎁 20260623</h2>
+<p class="small">ASCII instrument generator</p>
 
 <pre>
 #include <stdio.h>
 
-void heart();
-void message();
-
 int main() {
-    printf("Initializing...\n");
     printf("Loading...\n");
-
-    heart();
-    message();
-
+    printf("Run program...\n");
     return 0;
-}
-
-void heart() {
-    printf("  ***     *** \n");
-    printf("******* ******* \n");
-    printf(" *************  \n");
-    printf("  ***********   \n");
-    printf("    *******     \n");
-    printf("      ***       \n");
-}
-
-void message() {
-    printf("\n");
-    printf("KOREA → TAIWAN LINK\n\n");
-    printf("고마워요.\n");
-    printf("음악 덕분에 행복했어요.\n");
-    printf("또 만나요 ❤️\n");
 }
 </pre>
 
@@ -115,79 +93,7 @@ void message() {
 <p>Copies: <span id="c">0</span></p>
 </div>
 
-<div id="secret" style="margin-top:30px;color:#111;">.</div>
-
 <script>
-
-/////////////////////////////////////////////////
-// INTRO SAFE
-/////////////////////////////////////////////////
-
-window.addEventListener("DOMContentLoaded", () => {
-    setTimeout(() => {
-        const el = document.getElementById("introScreen");
-        if (!el) return;
-
-        el.style.opacity = "0";
-        setTimeout(() => el.remove(), 500);
-    }, 1200);
-
-    addView();
-});
-
-/////////////////////////////////////////////////
-// CANVAS ENGINE
-/////////////////////////////////////////////////
-
-const canvas = document.createElement("canvas");
-const ctx = canvas.getContext("2d");
-
-function textToStars(text, fontSize = 50) {
-
-    canvas.width = 400;
-    canvas.height = 120;
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // white background
-    ctx.fillStyle = "white";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    // text
-    ctx.font = `${fontSize}px sans-serif`;
-    ctx.fillStyle = "black";
-    ctx.textBaseline = "top";
-
-    ctx.fillText(text, 10, 10);
-
-    const img = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const data = img.data;
-
-    let result = "";
-    const step = 6;
-
-    for (let y = 0; y < canvas.height; y += step) {
-
-        let line = "";
-
-        for (let x = 0; x < canvas.width; x += step) {
-
-            const i = (y * canvas.width + x) * 4;
-
-            const r = data[i];
-            const g = data[i + 1];
-            const b = data[i + 2];
-
-            const isBlack = (r + g + b) < 300;
-
-            line += isBlack ? "★" : " ";
-        }
-
-        result += line + "\n";
-    }
-
-    return result;
-}
 
 /////////////////////////////////////////////////
 // STATS
@@ -222,6 +128,57 @@ function addView(){
 }
 
 /////////////////////////////////////////////////
+// ASCII ENGINE (responsive)
+/////////////////////////////////////////////////
+
+function getWidthScale() {
+    return Math.max(30, Math.min(80, Math.floor(window.innerWidth / 12)));
+}
+
+function makeGuitar() {
+    const w = getWidthScale();
+    let out = "";
+
+    out += " ".repeat(w * 0.2) + "🎸 GUITAR\n\n";
+
+    // head
+    out += " ".repeat(w * 0.25) + "||====||\n";
+    out += " ".repeat(w * 0.25) + "||====||\n";
+
+    // neck
+    for (let i = 0; i < 4; i++) {
+        out += " ".repeat(w * 0.28) + "||    ||\n";
+    }
+
+    // body
+    out += " ".repeat(w * 0.2) + "  _________\n";
+    out += " ".repeat(w * 0.2) + " /         \\\n";
+    out += " ".repeat(w * 0.2) + "/  GUITAR   \\\n";
+    out += " ".repeat(w * 0.2) + "\\           /\n";
+    out += " ".repeat(w * 0.2) + " \\_________/\n";
+
+    return out;
+}
+
+function makeMic() {
+    const w = getWidthScale();
+    let out = "\n";
+
+    out += " ".repeat(w * 0.3) + "🎤 MICROPHONE\n\n";
+
+    out += " ".repeat(w * 0.35) + " ___ \n";
+    out += " ".repeat(w * 0.35) + "|   |\n";
+    out += " ".repeat(w * 0.35) + "|   |\n";
+    out += " ".repeat(w * 0.35) + "|___|\n";
+    out += " ".repeat(w * 0.37) + " | |\n";
+    out += " ".repeat(w * 0.37) + " | |\n";
+    out += " ".repeat(w * 0.36) + " /   \\\n";
+    out += " ".repeat(w * 0.35) + "/_____\\\n";
+
+    return out;
+}
+
+/////////////////////////////////////////////////
 // RUN
 /////////////////////////////////////////////////
 
@@ -236,20 +193,13 @@ function run(){
     out.innerHTML = "";
 
     const lines = [
-        "gcc 컴파일 중...",
-        "문법 검사 중...",
-        "링크 처리 중...",
-        "프로그램 실행 중...",
+        "compiling...",
+        "linking modules...",
+        "running program...",
         "",
-        "████ 컴파일 성공 ████",
+        "████ SUCCESS ████",
         "",
-        "결과 출력:",
-        "",
-        "고마워요.",
-        "음악 덕분에 행복했어요.",
-        "음악으로 우리는 연결되어 있다고 생각해요.",
-        "",
-        "→ 출력 완료"
+        "output ready",
     ];
 
     let i = 0;
@@ -259,12 +209,8 @@ function run(){
         if (i >= lines.length) {
             clearInterval(timer);
 
-            // ⭐ 韓文星星字
-            const result = textToStars("상엽");
-
-            out.innerHTML += "<br><pre style='background:#111;padding:10px;'>" +
-                             result +
-                             "</pre>";
+            out.innerHTML += "<pre>" + makeGuitar() + "</pre>";
+            out.innerHTML += "<pre>" + makeMic() + "</pre>";
 
             return;
         }
@@ -290,40 +236,25 @@ function copy(){
         document.querySelector("pre").innerText
     );
 
-    alert("C 코드가 복사되었습니다.\n조심해서 실행해 주세요 ❤️");
+    alert("Copied.");
 }
 
 /////////////////////////////////////////////////
-// EASTER EGG
+// INIT
 /////////////////////////////////////////////////
 
-let keys = "";
+window.addEventListener("DOMContentLoaded", () => {
+    setTimeout(() => {
+        const el = document.getElementById("introScreen");
+        el.style.opacity = "0";
+        setTimeout(() => el.remove(), 500);
+    }, 1000);
 
-document.addEventListener("keydown", (e) => {
-
-    if (e.key.length === 1) {
-        keys += e.key.toLowerCase();
-    }
-
-    if(keys.includes("lucy")){
-        document.getElementById("secret").style.color = "#fff";
-        document.getElementById("secret").innerText =
-            "🎵 Hidden Message Unlocked:\n" +
-            "Thank you for your music.\n" +
-            "From Taiwan Fan ❤️";
-
-        keys = "";
-    }
-
-    if(keys.length > 20) keys = "";
+    addView();
+    render();
 });
 
 </script>
-
-<p style="margin-top:40px;color:#888;">
-This is not just code.<br>
-It is a message compiled with music.
-</p>
 
 </body>
 </html>
