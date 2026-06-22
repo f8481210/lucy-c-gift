@@ -124,6 +124,9 @@ setTimeout(() => {
         document.getElementById("introScreen").remove();
     }, 500);
 }, 1200);
+#introScreen {
+    transition: opacity 0.5s ease;
+}
 /////////////////////////////////////////////////
 // STATS (localStorage version - SAFE)
 /////////////////////////////////////////////////
@@ -196,7 +199,7 @@ function run(){
     let i = 0;
 
     let timer = setInterval(() => {
-        out.innerText += lines[i] + "\n";
+        out.innerHTML += lines[i] + "<br>";
         i++;
 
         if(i >= lines.length){
@@ -204,7 +207,7 @@ function run(){
 
             // ❤️ 愛心（在結束後才出現）
             out.innerHTML += `
-            <div style="margin-top:20px;">
+            <div style="margin-top:20px; display:flex; justify-content:center;">
                 <svg width="120" height="110" viewBox="0 0 24 24" fill="red">
                     <path d="M12 21s-6.7-4.35-9.33-7.14C.6 11.3 0 9.6 0 7.8 0 5.3 2 3.3 4.5 3.3c1.7 0 3.3.9 4.2 2.3C9.6 4.2 11.2 3.3 12.9 3.3 15.4 3.3 17.4 5.3 17.4 7.8c0 1.8-.6 3.5-2.67 6.06C18.7 16.65 12 21 12 21z"/>
                 </svg>
@@ -212,7 +215,7 @@ function run(){
             `;
 
             // NAME
-            const out = document.getElementById("output");
+            
 
 const star = "★";
 
