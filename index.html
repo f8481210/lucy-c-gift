@@ -62,7 +62,7 @@ font-family:monospace;
 
 </div>
 <h2>🎁 20260623 — 상엽에게</h2>
-<p class="small">C Language Gift Program</p>
+<p class="small">C 언어 선물 프로그램</p>
 
 <pre>
 #include <stdio.h>
@@ -102,8 +102,8 @@ void message() {
 }
 </pre>
 
-<button onclick="run()">RUN</button>
-<button onclick="copy()">COPY</button>
+<button onclick="run()">실행</button>
+<button onclick="copy()">복사</button>
 
 <div id="output"></div>
 
@@ -177,38 +177,42 @@ function run(){
     out.innerText = "";
 
     const lines = [
-        "gcc compiling...",
-        "Checking syntax...",
-        "Linking...",
-        "Running program...",
+        "gcc 컴파일 중...",
+        "문법 검사 중...",
+        "링크 처리 중...",
+        "프로그램 실행 중...",
         "",
-        "  ♥     ♥",
-        " ♥♥♥   ♥♥♥",
-        "♥♥♥♥♥ ♥♥♥♥♥",
-        " ♥♥♥♥♥♥♥♥♥",
-        "  ♥♥♥♥♥♥♥",
-        "    ♥♥♥",
+        "████ 컴파일 성공 ████",
+        "",
+        "결과 출력:",
         "",
         "고마워요.",
         "음악 덕분에 행복했어요.",
         "음악으로 우리는 연결되어 있다고 생각해요.",
         "",
-        "See you again, LUCY ❤️"
+        "→ 출력 완료"
     ];
 
     let i = 0;
+
     let timer = setInterval(() => {
         out.innerText += lines[i] + "\n";
         i++;
-        if(i >= lines.length) clearInterval(timer);
+
+        if(i >= lines.length){
+            clearInterval(timer);
+
+            // ❤️ 愛心（在結束後才出現）
+            out.innerHTML += `
+            <div style="margin-top:20px;">
+                <svg width="120" height="110" viewBox="0 0 24 24" fill="red">
+                    <path d="M12 21s-6.7-4.35-9.33-7.14C.6 11.3 0 9.6 0 7.8 0 5.3 2 3.3 4.5 3.3c1.7 0 3.3.9 4.2 2.3C9.6 4.2 11.2 3.3 12.9 3.3 15.4 3.3 17.4 5.3 17.4 7.8c0 1.8-.6 3.5-2.67 6.06C18.7 16.65 12 21 12 21z"/>
+                </svg>
+            </div>
+            `;
+        }
+
     }, 200);
-    out.innerHTML += `
-<div style="margin-top:20px;">
-<svg width="120" height="110" viewBox="0 0 24 24" fill="red">
-  <path d="M12 21s-6.7-4.35-9.33-7.14C.6 11.3 0 9.6 0 7.8 0 5.3 2 3.3 4.5 3.3c1.7 0 3.3.9 4.2 2.3C9.6 4.2 11.2 3.3 12.9 3.3 15.4 3.3 17.4 5.3 17.4 7.8c0 1.8-.6 3.5-2.67 6.06C18.7 16.65 12 21 12 21z"/>
-</svg>
-</div>
-`;
 }
 
 /////////////////////////////////////////////////
@@ -224,7 +228,7 @@ function copy(){
 
     navigator.clipboard.writeText(document.querySelector("pre").innerText);
 
-    alert("C code copied.\nCompile it with care ❤️");
+    alert("C 코드가 복사되었습니다.\n조심해서 실행해 주세요 ❤️");
 }
 
 /////////////////////////////////////////////////
