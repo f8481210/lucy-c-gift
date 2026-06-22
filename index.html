@@ -325,25 +325,8 @@ let beatDuration = 60 / currentBpm;
 
 let selectedFeedbacks = {}; 
 
-// 🌟 移到最頂層：全域的 Google Apps Script 計數器部署網址
-const GAS_COUNTER_URL = "https://script.google.com/macros/s/AKfycbwTb-29jZnzFwvgLg20AGgwX48SmpcjSmGdetNhyT0c96OJQjziBE-Iw8_vcw-ZcKYA/exec?type=visit";
-
-const NOTES = {
-    C3: 130.81, D3: 146.83, E3: 164.81, F3: 174.61, G3: 196.00, A3: 220.00, B3: 246.94,
-    C4: 261.63, D4: 293.66, E4: 329.63, F4: 349.23, G4: 392.00, A4: 440.00, B4: 493.88,
-    C5: 523.25, D5: 587.33, E5: 659.25, F5: 698.46, G5: 783.99, A5: 880.00
-};
-
-const SONG_DATA = [
-    { bass: NOTES.C3, treble: [NOTES.E4, NOTES.G4, NOTES.C5], label: "C Major" },
-    { bass: NOTES.G3, treble: [NOTES.D4, NOTES.G4, NOTES.B4], label: "G Major" },
-    { bass: NOTES.A3, treble: [NOTES.E4, NOTES.A4, NOTES.C5], label: "A Minor" },
-    { bass: NOTES.E3, treble: [NOTES.G4, NOTES.B4, NOTES.E5], label: "E Minor" },
-    { bass: NOTES.F3, treble: [NOTES.A4, NOTES.C5, NOTES.F5], label: "F Major" },
-    { bass: NOTES.C3, treble: [NOTES.E4, NOTES.G4, NOTES.C5], label: "C Major" },
-    { bass: NOTES.F3, treble: [NOTES.A4, NOTES.C5, NOTES.F5], label: "F Major" },
-    { bass: NOTES.G3, treble: [NOTES.B4, NOTES.D5, NOTES.G5], label: "G Major" }
-];
+// 🌟 修正點：將末端混淆的 ?type=visit 拿掉，保持網址乾淨結尾
+const GAS_COUNTER_URL = "https://script.google.com/macros/s/AKfycbwTb-29jZnzFwvgLg20AGgwX48SmpcjSmGdetNhyT0c96OJQjziBE-Iw8_vcw-ZcKYA/exec";
 
 // 向後台非同步更新並獲取最新次數
 function updateAndRenderCounter(type) {
@@ -462,7 +445,7 @@ function playGuitarTone(freq, startTime, duration, volume = 0.3) {
     if (!audioCtx) return;
     const osc = audioCtx.createOscillator();
     const gainNode = audioCtx.createGain();
-    const filter = audioCtx.createBiquadFilter();
+    const filter = biquadFilter = audioCtx.createBiquadFilter();
     filter.type = "lowpass";
     filter.frequency.setValueAtTime(2000, startTime);
     filter.frequency.exponentialRampToValueAtTime(300, startTime + duration);
