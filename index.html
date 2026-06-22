@@ -354,7 +354,7 @@ function render(){
     document.getElementById("v").innerText = s.v; // 補上這行：更新開啟網頁次數
 }
 
-// 複選切換邏輯：點一下亮，再點一下滅
+// 修改後的複選切換邏輯
 function toggleFeedback(id, textValue) {
     const btn = document.getElementById(`fb${id}`);
     if (selectedFeedbacks[id]) {
@@ -364,34 +364,60 @@ function toggleFeedback(id, textValue) {
         selectedFeedbacks[id] = textValue;
         btn.classList.add('selected');
     }
+    
+    // 🌟 只要有選東西，就開啟「防離屏/防重複點擊」保護
+    checkFeedbackDraftStatus();
 }
 
-// 點擊「送出回饋」按鈕觸發
+// 監聽打字與選項狀態
+function checkFeedbackDraftStatus() {
+    const hasComment = document.getElementById("commentInput").value.trim().length > 0;
+    const hasSelected = Object.keys(selectedFeedbacks).length > 0;
+    
+    if (hasComment || hasSelected) {
+        // 只要有動手，上面的執行按鈕就「絕對不能解除反灰」
+        document.getElementById("runBtn").disabled = true;
+        document.getElementById("fbStatus").style.color = "#ff4a4a"; // 變成警告紅字
+        document.getElementById("fbStatus").innerText = "⚠️ 작성 중인 피드백이 있습니다. 먼저 '피드백 보내기'를 눌러주세요! (請先點選送出回饋唷！)";
+        
+        // 開啟瀏覽器關閉警告
+        window.onbeforeunload = function() { return "變更尚未儲存"; };
+    } else {
+        // 如果都清空了（沒選也沒打字），且音樂沒在放，才釋放按鈕
+        if (!playing) {
+            document.getElementById("runBtn").disabled = false;
+            document.getElementById("fbStatus").innerText = "";
+        }
+        window.onbeforeunload = null; // 解除警告
+    }
+}
+
 function submitAllFeedback() {
-    // 取得所有選取的項目並用逗號組合
     const valuesArray = Object.values(selectedFeedbacks);
     if(valuesArray.length === 0) {
-        document.getElementById("fbStatus").innerText = "⚠️ 피드백을 최소 하나 이상 선택해 주세요!";
+        document.getElementById("fbStatus").style.color = "#ff4a4a";
+        document.getElementById("fbStatus").innerText = "⚠️ 피드백을 최소 하나 이상選択해 주세요! (請至少選擇一項回饋)";
         return;
     }
     const combinedFeedbackText = valuesArray.join(', ');
     
-    // 取得非必填留言內容
     let commentText = document.getElementById("commentInput").value.trim();
     if(!commentText) commentText = "(無留言)";
 
-    document.getElementById("fbStatus").innerText = "선택이 완료되었습니다!";
+    // 變成漂亮的綠色成功字體
+    document.getElementById("fbStatus").style.color = "#00ffcc";
+    document.getElementById("fbStatus").innerText = "선택이 완료되었습니다! 고마워요 오빠 ❤️";
 
     const s = getStats();
     const nowTime = new Date().toLocaleString();
 
-    // ⚠️【請在下方替換妳的 Google 表單資訊】⚠️
-    const formUrl = "https://docs.google.com/forms/u/0/d/1nf2Ppq0N1tViE6q0IXoTnN0G9TOgLPAwDqmJ3iV66qg/formResponse";
-    const entryIdFeedback = "entry.1743892404"; // 1. 回饋內容 (必填)
-    const entryIdComment  = "entry.843652598";  // 2. 額外想說的話 (選填)
-    const entryIdRuns     = "entry.473987453";  // 3. 這是第幾次玩（執行次數）(必填)
-    const entryIdVisits   = "entry.1014475186"; // 4. 進入網頁的次數 (必填)
-    const entryIdTime     = "entry.1840065408"; // 5. 發送當下的網頁時間 (必填)
+    // 妳的 Google 表單設定
+    const formUrl = "https://docs.google.com/forms/u/0/d/1nf2Ppq0N1tViE6q0IXoTnN0G9TOgLPAwDqmJ3iV66qg/formResponse"; 
+    const entryIdFeedback = "entry.1743892404"; 
+    const entryIdComment  = "entry.843652598";  
+    const entryIdRuns     = "entry.473987453";  
+    const entryIdVisits   = "entry.1014475186"; 
+    const entryIdTime     = "entry.1840065408"; 
 
     const formData = new FormData();
     formData.append(entryIdFeedback, combinedFeedbackText);
@@ -406,10 +432,11 @@ function submitAllFeedback() {
         body: formData
     }).catch(err => console.log("Sent"));
 
-    // 解鎖執行按鈕，讓他玩下一次
+    // 🌟 成功送出後：解除網頁關閉警告、解鎖上面的執行按鈕
+    window.onbeforeunload = null; 
     document.getElementById("runBtn").disabled = false;
     
-    // 鎖死回饋區的所有操作，直到下次播完音樂
+    // 鎖死這一輪的回饋區
     setFeedbackAreaDisabled(true);
 }
 
@@ -444,6 +471,7 @@ function playGuitarTone(freq, startTime, duration, volume = 0.3) {
 function run(){
     if(playing) return; 
     
+    // 執行次數 +1
     const s = getStats();
     s.r++;
     saveStats(s);
@@ -454,15 +482,20 @@ function run(){
     }
 
     playing = true;
-    selectedFeedbacks = {}; // 清空上輪被選取的項目
+    selectedFeedbacks = {}; // 清空上一輪被選取的項目
     
-    // 播歌期間：鎖死執行按鈕
+    // 1. 🌟 核心修改：按下執行的瞬間，執行按鈕變黑（反灰鎖死）
     document.getElementById("runBtn").disabled = true;
     document.getElementById("fbStatus").innerText = ""; 
     document.getElementById("commentInput").value = ""; // 清空上輪輸入
     
+    // 清除上一次按鈕亮起的顏色
     const buttons = document.querySelectorAll('.fb-btn');
     buttons.forEach(btn => btn.classList.remove('selected'));
+
+    // 2. 🌟 核心修改：실행變黑的同時，立刻把下面的回饋、留言、送出按鈕全部「解鎖打開」！
+    setFeedbackAreaDisabled(false);
+    document.getElementById("fbStatus").innerText = "🎵 음악을 들으면서 피드백을 선택해 주세요! (可以邊聽邊選唷！)";
 
     document.getElementById("guitarWrapper").classList.add("playing");
 
@@ -524,6 +557,93 @@ function run(){
     }
     requestAnimationFrame(drawFrame);
 
+    // 音樂結束
+    setTimeout(() => {
+        playing = false;
+        strings.forEach((str, idx) => str.setAttribute("y2", defaultY2[idx])); 
+        document.getElementById("guitarWrapper").classList.remove("playing");
+        document.getElementById("output").innerText = "Song finished. Done. ✨";
+        
+        // 🌟 這裡原本的解鎖程式碼拿掉了，因為我們在最上面一按鈕變黑時就已經提早解鎖了！
+    }, totalDurationMs);
+}
+
+// 點擊「送出回饋」按鈕觸發
+function submitAllFeedback() {
+    const valuesArray = Object.values(selectedFeedbacks);
+    if(valuesArray.length === 0) {
+        document.getElementById("fbStatus").innerText = "⚠️ 피드백을 최소 하나 이상 선택해 주세요! (請至少選擇一項回饋)";
+        return;
+    }
+    const combinedFeedbackText = valuesArray.join(', ');
+    
+    let commentText = document.getElementById("commentInput").value.trim();
+    if(!commentText) commentText = "(無留言)";
+
+    document.getElementById("fbStatus").innerText = "선택이 완료되었습니다! 고마워요 오빠 ❤️";
+
+    const s = getStats();
+    const nowTime = new Date().toLocaleString();
+
+    // 填入妳的 Google 表單資訊
+    const formUrl = "https://docs.google.com/forms/u/0/d/1nf2Ppq0N1tViE6q0IXoTnN0G9TOgLPAwDqmJ3iV66qg/formResponse"; 
+    const entryIdFeedback = "entry.1743892404"; 
+    const entryIdComment  = "entry.843652598";  
+    const entryIdRuns     = "entry.473987453";  
+    const entryIdVisits   = "entry.1014475186"; 
+    const entryIdTime     = "entry.1840065408"; 
+
+    const formData = new FormData();
+    formData.append(entryIdFeedback, combinedFeedbackText);
+    formData.append(entryIdComment, commentText);
+    formData.append(entryIdRuns, s.r);
+    formData.append(entryIdVisits, s.v);
+    formData.append(entryIdTime, nowTime);
+
+    fetch(formUrl, {
+        method: "POST",
+        mode: "no-cors",
+        body: formData
+    }).catch(err => console.log("Sent"));
+
+    // 🌟 核心邏輯：直到他按下「送出回饋」按鈕，上面的「실행」按鈕才會再度解除反灰，讓他玩下一次！
+    document.getElementById("runBtn").disabled = false;
+    
+    // 同時把回饋區鎖定，防止重複送出
+    setFeedbackAreaDisabled(true);
+}
+
+    const finalTime = timeCursor;
+    playGuitarTone(NOTES.C3, finalTime, beatDuration * 4, 0.35);
+    playGuitarTone(NOTES.E4, finalTime + 0.03, beatDuration * 4, 0.25);
+    playGuitarTone(NOTES.G4, finalTime + 0.06, beatDuration * 4, 0.25);
+    playGuitarTone(NOTES.C5, finalTime + 0.09, beatDuration * 4, 0.30);
+
+    setTimeout(() => {
+        document.getElementById("output").innerText = `Ending: C Major Chord 🌊`;
+    }, (finalTime - now) * 1000);
+
+    const strings = [
+        document.getElementById("s1"), document.getElementById("s2"),
+        document.getElementById("s3"), document.getElementById("s4"),
+        document.getElementById("s5"), document.getElementById("s6")
+    ];
+    const defaultY2 = [163, 167, 172, 178, 183, 187];
+
+    let animFrame = 0;
+    const totalDurationMs = (finalTime + beatDuration * 4 - now) * 1000;
+
+    function drawFrame() {
+        animFrame++;
+        const offset = Math.sin(animFrame * 0.6) * 1.8;
+        strings.forEach((str, idx) => {
+            const side = idx % 2 === 0 ? 1 : -1;
+            str.setAttribute("y2", defaultY2[idx] + (offset * side));
+        });
+        if (playing) requestAnimationFrame(drawFrame);
+    }
+    requestAnimationFrame(drawFrame);
+
     // 音樂結束：這時候才把回饋、留言、送出按鈕全部解除反灰！
     setTimeout(() => {
         playing = false;
@@ -541,6 +661,9 @@ window.addEventListener("DOMContentLoaded", () => {
     s.v++; 
     saveStats(s);
     render();
+
+    // 🌟 補上這段：隨時監聽藝人有沒有在輸入框打字
+    document.getElementById("commentInput").addEventListener("input", checkFeedbackDraftStatus);
 
     setTimeout(()=>{
         document.getElementById("introScreen").style.opacity = "0";
