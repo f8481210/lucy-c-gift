@@ -162,7 +162,28 @@ function addView(){
 addView();
 
 /////////////////////////////////////////////////
-// RUN
+// INTRO SAFE VERSION
+/////////////////////////////////////////////////
+
+window.addEventListener("DOMContentLoaded", () => {
+
+    setTimeout(() => {
+        const el = document.getElementById("introScreen");
+        if (!el) return;
+
+        el.style.opacity = "0";
+
+        setTimeout(() => {
+            el.remove();
+        }, 500);
+
+    }, 1200);
+
+    addView();
+});
+
+/////////////////////////////////////////////////
+// RUN (STABLE VERSION)
 /////////////////////////////////////////////////
 
 function run(){
@@ -196,28 +217,17 @@ function run(){
 
     const timer = setInterval(() => {
 
-    if (i >= lines.length) {
-        clearInterval(timer);
-        return;
-    }
+        if (i >= lines.length) {
+            clearInterval(timer);
 
-    out.innerHTML += lines[i] + "<br>";
-    i++;
-
-    if(i === lines.length){
-        clearInterval(timer);
-
-        // heart
-        out.innerHTML += `
-        <div style="margin-top:20px; display:flex; justify-content:center;">
-            <svg width="120" height="110" viewBox="0 0 24 24" fill="red">
-                <path d="M12 21s-6.7-4.35-9.33-7.14C.6 11.3 0 9.6 0 7.8 0 5.3 2 3.3 4.5 3.3c1.7 0 3.3.9 4.2 2.3C9.6 4.2 11.2 3.3 12.9 3.3 15.4 3.3 17.4 5.3 17.4 7.8c0 1.8-.6 3.5-2.67 6.06C18.7 16.65 12 21 12 21z"/>
-            </svg>
-        </div>
-        `;
-    }
-
-}, 120);
+            // heart
+            out.innerHTML += `
+            <div style="margin-top:20px; display:flex; justify-content:center;">
+                <svg width="120" height="110" viewBox="0 0 24 24" fill="red">
+                    <path d="M12 21s-6.7-4.35-9.33-7.14C.6 11.3 0 9.6 0 7.8 0 5.3 2 3.3 4.5 3.3c1.7 0 3.3.9 4.2 2.3C9.6 4.2 11.2 3.3 12.9 3.3 15.4 3.3 17.4 5.3 17.4 7.8c0 1.8-.6 3.5-2.67 6.06C18.7 16.65 12 21 12 21z"/>
+                </svg>
+            </div>
+            `;
 
             // ASCII NAME
             const sBlock = [
@@ -243,11 +253,15 @@ function run(){
             sBlock.forEach(l => out.innerHTML += l + "<br>");
             out.innerHTML += "<br>";
             nBlock.forEach(l => out.innerHTML += l + "<br>");
+
+            return;
         }
+
+        out.innerHTML += lines[i] + "<br>";
+        i++;
 
     }, 120);
 }
-
 /////////////////////////////////////////////////
 // COPY
 /////////////////////////////////////////////////
