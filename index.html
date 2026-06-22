@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>20260623 — 상엽에게</title>
+
 <style>
 body {
     background:#0b0b0b;
@@ -11,6 +12,7 @@ body {
     text-align:center;
     padding:30px;
 }
+
 pre {
     background:#1c1c1c;
     padding:15px;
@@ -18,17 +20,25 @@ pre {
     overflow-x:auto;
     border-radius:8px;
 }
+
 button {
     padding:10px 20px;
     margin:10px;
     cursor:pointer;
 }
+
 #output {
     margin-top:20px;
     white-space:pre-line;
     min-height:200px;
 }
+
 .small { color:#aaa; }
+
+.stats {
+    margin-top:20px;
+    color:#ccc;
+}
 </style>
 </head>
 
@@ -82,46 +92,86 @@ void message() {
 
 <hr>
 
-<p>Views: <span id="v">1</span></p>
+<div class="stats">
+<p>Views: <span id="v">0</span></p>
 <p>Runs: <span id="r">0</span></p>
 <p>Copies: <span id="c">0</span></p>
+</div>
+
+<div id="secret" style="margin-top:30px;color:#111;">.</div>
 
 <script>
 
-async function loadStats() {
-    let res = await fetch("/api/stats?type=view");
-    let data = await res.json();
+/////////////////////////////////////////////////
+// STATS (localStorage version - SAFE)
+/////////////////////////////////////////////////
 
-    document.getElementById("v").innerText = data.views;
-    document.getElementById("r").innerText = data.runs;
-    document.getElementById("c").innerText = data.copies;
+function getStats(){
+    return {
+        v: Number(localStorage.getItem("v") || 0),
+        r: Number(localStorage.getItem("r") || 0),
+        c: Number(localStorage.getItem("c") || 0),
+    };
 }
 
-loadStats();
+function saveStats(s){
+    localStorage.setItem("v", s.v);
+    localStorage.setItem("r", s.r);
+    localStorage.setItem("c", s.c);
+}
 
-async function run() {
+function render(){
+    let s = getStats();
+    document.getElementById("v").innerText = s.v;
+    document.getElementById("r").innerText = s.r;
+    document.getElementById("c").innerText = s.c;
+}
 
-    let res = await fetch("/api/stats?type=run");
-    let data = await res.json();
+function addView(){
+    let s = getStats();
+    s.v++;
+    saveStats(s);
+    render();
+}
 
-    document.getElementById("r").innerText = data.runs;
+/////////////////////////////////////////////////
+// INIT
+/////////////////////////////////////////////////
 
-    // 原本動畫照舊
+addView();
+
+/////////////////////////////////////////////////
+// RUN
+/////////////////////////////////////////////////
+
+function run(){
+
+    let s = getStats();
+    s.r++;
+    saveStats(s);
+    render();
+
     const out = document.getElementById("output");
     out.innerText = "";
 
     const lines = [
         "gcc compiling...",
         "Checking syntax...",
+        "Linking...",
         "Running program...",
         "",
-        "♥  ♥  ♥",
-        "  ♥♥♥",
-        "   ♥",
+        "  ♥     ♥",
+        " ♥♥♥   ♥♥♥",
+        "♥♥♥♥♥ ♥♥♥♥♥",
+        " ♥♥♥♥♥♥♥♥♥",
+        "  ♥♥♥♥♥♥♥",
+        "    ♥♥♥",
         "",
         "고마워요.",
         "음악 덕분에 행복했어요.",
-        "또 만나요 ❤️"
+        "음악으로 우리는 연결되어 있다고 생각해요.",
+        "",
+        "See you again, LUCY ❤️"
     ];
 
     let i = 0;
@@ -132,38 +182,46 @@ async function run() {
     }, 200);
 }
 
-async function copy() {
+/////////////////////////////////////////////////
+// COPY
+/////////////////////////////////////////////////
 
-    let res = await fetch("/api/stats?type=copy");
-    let data = await res.json();
+function copy(){
 
-    document.getElementById("c").innerText = data.copies;
+    let s = getStats();
+    s.c++;
+    saveStats(s);
+    render();
 
     navigator.clipboard.writeText(document.querySelector("pre").innerText);
 
-    alert("Copied!");
+    alert("C code copied!");
 }
 
-</script>
-<div id="secret" style="margin-top:30px;color:#111;">.</div>
+/////////////////////////////////////////////////
+// EASTER EGG
+/////////////////////////////////////////////////
 
-<script>
 let keys = "";
 
 document.addEventListener("keydown", function(e){
-    keys += e.key;
 
-    // 觸發彩蛋：輸入 "lucy"
+    keys += e.key.toLowerCase();
+
     if(keys.includes("lucy")){
         document.getElementById("secret").style.color = "#fff";
         document.getElementById("secret").innerText =
-        "🎵 Hidden Message Unlocked:\nThank you for your music.\nFrom Taiwan Fan ❤️";
+        "🎵 Hidden Message Unlocked:\n" +
+        "Thank you for your music.\n" +
+        "From Taiwan Fan ❤️";
 
         keys = "";
     }
 
     if(keys.length > 20) keys = "";
 });
+
 </script>
+
 </body>
 </html>
