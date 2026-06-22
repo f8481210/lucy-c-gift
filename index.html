@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>20260623 — gift</title>
-
+<canvas id="art"></canvas>
 <style>
 body {
     background:#0b0b0b;
@@ -44,6 +44,14 @@ button {
 
 #introScreen {
     transition: opacity 0.5s ease;
+}
+    canvas {
+    margin-top:20px;
+    background:#111;
+    border-radius:10px;
+    width:100%;
+    max-width:700px;
+    height:auto;
 }
 </style>
 </head>
@@ -182,43 +190,93 @@ function makeMic() {
 // RUN
 /////////////////////////////////////////////////
 
-function run(){
+function drawGuitar(ctx, w, h) {
+
+    ctx.strokeStyle = "#fff";
+    ctx.lineWidth = 3;
+
+    // neck
+    ctx.beginPath();
+    ctx.moveTo(w * 0.5, h * 0.1);
+    ctx.lineTo(w * 0.5, h * 0.6);
+    ctx.stroke();
+
+    // head
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(w * 0.47, h * 0.05, w * 0.06, h * 0.06);
+
+    // body (simple circle)
+    ctx.beginPath();
+    ctx.arc(w * 0.5, h * 0.75, w * 0.18, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // sound hole
+    ctx.beginPath();
+    ctx.arc(w * 0.5, h * 0.75, w * 0.06, 0, Math.PI * 2);
+    ctx.stroke();
+}
+
+function drawMic(ctx, w, h) {
+
+    ctx.strokeStyle = "#fff";
+    ctx.lineWidth = 3;
+
+    // head
+    ctx.beginPath();
+    ctx.arc(w * 0.5, h * 0.2, w * 0.08, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // body
+    ctx.beginPath();
+    ctx.moveTo(w * 0.5, h * 0.28);
+    ctx.lineTo(w * 0.5, h * 0.65);
+    ctx.stroke();
+
+    // stand
+    ctx.beginPath();
+    ctx.moveTo(w * 0.5, h * 0.65);
+    ctx.lineTo(w * 0.35, h * 0.9);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(w * 0.5, h * 0.65);
+    ctx.lineTo(w * 0.65, h * 0.9);
+    ctx.stroke();
+}
+
+function run() {
 
     const s = getStats();
     s.r++;
     saveStats(s);
     render();
 
+    const canvas = document.getElementById("art");
+    const ctx = canvas.getContext("2d");
+
+    // 自適應尺寸（關鍵）
+    const size = Math.min(window.innerWidth * 0.8, 600);
+    canvas.width = size;
+    canvas.height = size;
+
+    ctx.clearRect(0, 0, size, size);
+
     const out = document.getElementById("output");
-    out.innerHTML = "";
+    out.innerHTML = "rendering...";
 
-    const lines = [
-        "compiling...",
-        "linking modules...",
-        "running program...",
-        "",
-        "████ SUCCESS ████",
-        "",
-        "output ready",
-    ];
+    setTimeout(() => {
 
-    let i = 0;
+        ctx.clearRect(0, 0, size, size);
 
-    const timer = setInterval(() => {
+        // 上半部：吉他
+        drawGuitar(ctx, size, size);
 
-        if (i >= lines.length) {
-            clearInterval(timer);
+        // 下半部：麥克風
+        drawMic(ctx, size, size);
 
-            out.innerHTML += "<pre>" + makeGuitar() + "</pre>";
-            out.innerHTML += "<pre>" + makeMic() + "</pre>";
+        out.innerHTML = "done.";
 
-            return;
-        }
-
-        out.innerHTML += lines[i] + "<br>";
-        i++;
-
-    }, 120);
+    }, 300);
 }
 
 /////////////////////////////////////////////////
