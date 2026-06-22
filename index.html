@@ -40,7 +40,6 @@ button {
     color:#ccc;
 }
 
-/* intro fade */
 #introScreen {
     transition: opacity 0.5s ease;
 }
@@ -85,8 +84,7 @@ int main() {
     return 0;
 }
 
-void heart() 
-{
+void heart() {
     printf("  ***     *** \n");
     printf("******* ******* \n");
     printf(" *************  \n");
@@ -120,12 +118,76 @@ void message() {
 <div id="secret" style="margin-top:30px;color:#111;">.</div>
 
 <script>
-// intro fade
-setTimeout(() => {
-    const el = document.getElementById("introScreen");
-    el.style.opacity = "0";
-    setTimeout(() => el.remove(), 500);
-}, 1200);
+
+/////////////////////////////////////////////////
+// INTRO SAFE
+/////////////////////////////////////////////////
+
+window.addEventListener("DOMContentLoaded", () => {
+    setTimeout(() => {
+        const el = document.getElementById("introScreen");
+        if (!el) return;
+
+        el.style.opacity = "0";
+        setTimeout(() => el.remove(), 500);
+    }, 1200);
+
+    addView();
+});
+
+/////////////////////////////////////////////////
+// CANVAS ENGINE
+/////////////////////////////////////////////////
+
+const canvas = document.createElement("canvas");
+const ctx = canvas.getContext("2d");
+
+function textToStars(text, fontSize = 50) {
+
+    canvas.width = 400;
+    canvas.height = 120;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // white background
+    ctx.fillStyle = "white";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // text
+    ctx.font = `${fontSize}px sans-serif`;
+    ctx.fillStyle = "black";
+    ctx.textBaseline = "top";
+
+    ctx.fillText(text, 10, 10);
+
+    const img = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const data = img.data;
+
+    let result = "";
+    const step = 6;
+
+    for (let y = 0; y < canvas.height; y += step) {
+
+        let line = "";
+
+        for (let x = 0; x < canvas.width; x += step) {
+
+            const i = (y * canvas.width + x) * 4;
+
+            const r = data[i];
+            const g = data[i + 1];
+            const b = data[i + 2];
+
+            const isBlack = (r + g + b) < 300;
+
+            line += isBlack ? "★" : " ";
+        }
+
+        result += line + "\n";
+    }
+
+    return result;
+}
 
 /////////////////////////////////////////////////
 // STATS
@@ -159,31 +221,8 @@ function addView(){
     render();
 }
 
-addView();
-
 /////////////////////////////////////////////////
-// INTRO SAFE VERSION
-/////////////////////////////////////////////////
-
-window.addEventListener("DOMContentLoaded", () => {
-
-    setTimeout(() => {
-        const el = document.getElementById("introScreen");
-        if (!el) return;
-
-        el.style.opacity = "0";
-
-        setTimeout(() => {
-            el.remove();
-        }, 500);
-
-    }, 1200);
-
-    addView();
-});
-
-/////////////////////////////////////////////////
-// RUN (STABLE VERSION)
+// RUN
 /////////////////////////////////////////////////
 
 function run(){
@@ -220,39 +259,12 @@ function run(){
         if (i >= lines.length) {
             clearInterval(timer);
 
-            // heart
-            out.innerHTML += `
-            <div style="margin-top:20px; display:flex; justify-content:center;">
-                <svg width="120" height="110" viewBox="0 0 24 24" fill="red">
-                    <path d="M12 21s-6.7-4.35-9.33-7.14C.6 11.3 0 9.6 0 7.8 0 5.3 2 3.3 4.5 3.3c1.7 0 3.3.9 4.2 2.3C9.6 4.2 11.2 3.3 12.9 3.3 15.4 3.3 17.4 5.3 17.4 7.8c0 1.8-.6 3.5-2.67 6.06C18.7 16.65 12 21 12 21z"/>
-                </svg>
-            </div>
-            `;
+            // ⭐ 韓文星星字
+            const result = textToStars("상엽");
 
-            // ASCII NAME
-            const sBlock = [
-                "★★★★★★★        ★★★★★★★",
-                "★★★★★★★★      ★★★★★★★★",
-                "★★★    ★★★    ★★★    ★★★",
-                "★★★           ★★★",
-                "★★★★★★★★      ★★★★★★★★",
-                "★★★★★★★        ★★★★★★★"
-            ];
-
-            const nBlock = [
-                "★★★★★★★     ★★★★★★★",
-                "★★★★★★★★    ★★★★★★★★",
-                "★★★   ★★★   ★★★   ★★★",
-                "★★★    ★★★  ★★★   ★★★",
-                "★★★     ★★★ ★★★   ★★★",
-                "★★★      ★★★★★    ★★★"
-            ];
-
-            out.innerHTML += "<br>";
-
-            sBlock.forEach(l => out.innerHTML += l + "<br>");
-            out.innerHTML += "<br>";
-            nBlock.forEach(l => out.innerHTML += l + "<br>");
+            out.innerHTML += "<br><pre style='background:#111;padding:10px;'>" +
+                             result +
+                             "</pre>";
 
             return;
         }
@@ -262,6 +274,7 @@ function run(){
 
     }, 120);
 }
+
 /////////////////////////////////////////////////
 // COPY
 /////////////////////////////////////////////////
@@ -304,6 +317,7 @@ document.addEventListener("keydown", (e) => {
 
     if(keys.length > 20) keys = "";
 });
+
 </script>
 
 <p style="margin-top:40px;color:#888;">
