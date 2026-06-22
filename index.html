@@ -243,15 +243,15 @@ void heart() {
     printf("       ***       \n");
 }
 void message() {
-    printf("처음으로 코딩해서 이런 웹사이트를 만들었어요!😆 \n");
-    printf("심지어 기타도 전부 코드로 직접 만든 거예요 🎸✨ \n");
-    printf("근데 제가 기타을 못 쳐서 코드가 맞는지 잘 모르겠어요 \n");
-    printf("전체 웹페이지는 약 3시간 정도 걸려서 완성했어요 \n");
-    printf("상엽오빠한테 보여주고 싶어서 열심히 만들었어요ㅎㅎ \n");
-    printf("저는 진짜 너무너무 마음에 들어요❤️ \n");
-    printf("오빠도 혹시 좋아해 주면 좋겠어요 \n");
-    printf("항상 오빠가 주는 따뜻함만 받는 게 아니라 \n");
-    printf("오빠에게 작은 감동이라도 줄 수 있으면 좋겠어요🥺 \n");
+    printf(" 처음으로 코딩해서 이런 웹사이트를 만들었어요!😆 \n");
+    printf(" 심지어 기타도 전부 코드로 직접 만든 거예요 🎸✨ \n");
+    printf(" 근데 제가 기타을 못 쳐서 코드가 맞는지 잘 모르겠어요 \n");
+    printf(" 전체 웹페이지는 약 3시간 정도 걸려서 완성했어요 \n");
+    printf(" 상엽오빠한테 보여주고 싶어서 열심히 만들었어요ㅎㅎ \n");
+    printf(" 저는 진짜 너무너무 마음에 들어요❤️ \n");
+    printf(" 오빠도 혹시 좋아해 주면 좋겠어요 \n");
+    printf(" 항상 오빠가 주는 따뜻함만 받는 게 아니라 \n");
+    printf(" 오빠에게 작은 감동이라도 줄 수 있으면 좋겠어요🥺 \n");
 }
 </pre>
 
@@ -342,21 +342,31 @@ const SONG_DATA = [
     { bass: NOTES.G3, treble: [NOTES.B4, NOTES.D5, NOTES.G5], label: "G Major" }
 ];
 
-function getStats(){
-    return {
-        r: Number(localStorage.getItem("r") || 0),
-        v: Number(localStorage.getItem("v") || 0)
-    };
+// 向後台非同步更新並獲取最新次數
+function updateAndRenderCounter(type) {
+    fetch(`${GAS_COUNTER_URL}?type=${type}`)
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById("v").innerText = data.visits;
+            document.getElementById("r").innerText = data.runs;
+            
+            // 順便儲存到本地，避免網路延遲時畫面為空
+            localStorage.setItem("global_v", data.visits);
+            localStorage.setItem("global_r", data.runs);
+        })
+        .catch(err => {
+            console.error("Counter Error:", err);
+            // 斷網或出錯時的備援顯示
+            document.getElementById("v").innerText = localStorage.getItem("global_v") || "0";
+            document.getElementById("r").innerText = localStorage.getItem("global_r") || "0";
+        });
 }
-function saveStats(s){
-    localStorage.setItem("r", s.r);
-    localStorage.setItem("v", s.v);
-}
-// 同時將 Counts 即時繪製到網頁最下方
-function render(){
-    const s = getStats();
-    document.getElementById("r").innerText = s.r;
-    document.getElementById("v").innerText = s.v; 
+
+// 覆蓋原本的 render 函式
+function render() {
+    // 這裡我們直接用快取數值打底，真正的數值會由 API 刷新
+    document.getElementById("v").innerText = localStorage.getItem("global_v") || "0";
+    document.getElementById("r").innerText = localStorage.getItem("global_r") || "0";
 }
 
 function toggleFeedback(id, textValue) {
@@ -471,9 +481,8 @@ function playGuitarTone(freq, startTime, duration, volume = 0.3) {
 function run(){
     if(playing) return; 
     
-    const s = getStats();
-    s.r++;
-    saveStats(s);
+    // 🌟 改成向全域資料庫發送執行 +1 請求
+    updateAndRenderCounter("run");
     render();
 
     if(!audioCtx){
@@ -482,6 +491,8 @@ function run(){
 
     playing = true;
     selectedFeedbacks = {}; 
+    // 🌟 貼上妳剛剛複製的 Google Apps Script 部署網址
+    const GAS_COUNTER_URL = "https://script.google.com/macros/s/AKfycbwKCE1UTZUWRWjAk0kqcOkT1A3YqxOmpICQJj6tm2sE7AuppURd470aS3epOw3xfWnG/exec";
     
     // 按下執行的瞬間，執行按鈕變黑（反灰鎖死），同時解鎖下方回饋區
     document.getElementById("runBtn").disabled = true;
@@ -564,10 +575,11 @@ function run(){
 }
 
 window.addEventListener("DOMContentLoaded", () => {
-    const s = getStats();
-    s.v++; 
-    saveStats(s);
+    // 預先渲染本地快取數字
     render();
+    
+    // 🌟 一進網頁，立刻觸發全域進站次數 +1，並抓取最新總數
+    updateAndRenderCounter("visit");
 
     // 隨時監聽輸入框的打字狀態
     document.getElementById("commentInput").addEventListener("input", checkFeedbackDraftStatus);
