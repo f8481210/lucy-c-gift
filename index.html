@@ -99,19 +99,26 @@ function run() {
     out.innerText = "";
 
     const lines = [
-        "Compiling program...",
-        "Running...",
+        "Compiling source code...",
+        "Checking syntax...",
+        "Linking libraries...",
+        "Running program...",
         "",
-        "  ***     ***",
-        "******* *******",
-        " *************",
-        "  ***********",
-        "    *******",
-        "      ***",
+        "Generating output...",
+        "",
+        "  ♥     ♥",
+        " ♥♥♥   ♥♥♥",
+        "♥♥♥♥♥ ♥♥♥♥♥",
+        " ♥♥♥♥♥♥♥♥♥",
+        "  ♥♥♥♥♥♥♥",
+        "   ♥♥♥♥♥",
+        "    ♥♥♥",
         "",
         "고마워요.",
         "음악 덕분에 행복했어요.",
-        "또 만나요 ❤️"
+        "우리 음악으로 연결되어 있어요.",
+        "",
+        "See you again, LUCY ❤️"
     ];
 
     let i = 0;
@@ -119,7 +126,7 @@ function run() {
         out.innerText += lines[i] + "\n";
         i++;
         if(i >= lines.length) clearInterval(timer);
-    }, 250);
+    }, 220);
 }
 
 function copy() {
