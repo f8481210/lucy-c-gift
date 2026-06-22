@@ -39,6 +39,9 @@ button {
     margin-top:20px;
     color:#ccc;
 }
+    #introScreen {
+    transition: opacity 0.5s ease;
+}
 </style>
 </head>
 
@@ -124,9 +127,7 @@ setTimeout(() => {
         document.getElementById("introScreen").remove();
     }, 500);
 }, 1200);
-#introScreen {
-    transition: opacity 0.5s ease;
-}
+
 /////////////////////////////////////////////////
 // STATS (localStorage version - SAFE)
 /////////////////////////////////////////////////
@@ -213,6 +214,7 @@ function run(){
                 </svg>
             </div>
             `;
+        }}
 
             // NAME
             
@@ -247,11 +249,11 @@ const n = [
 ];
 
 // 상
-s.forEach(l => out.innerText += l + "\n");
-out.innerText += "\n";
+s.forEach(l => out.innerText += l + "<br>");
+out.innerText += "<br>";
 
 // 엽
-n.forEach(l => out.innerText += l + "\n");
+n.forEach(l => out.innerText += l + "<br>");
 }
 
 /////////////////////////////////////////////////
