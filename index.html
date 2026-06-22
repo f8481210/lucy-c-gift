@@ -88,37 +88,40 @@ void message() {
 
 <script>
 
-let r = 0;
-let c = 0;
+async function loadStats() {
+    let res = await fetch("/api/stats?type=view");
+    let data = await res.json();
 
-function run() {
-    r++;
-    document.getElementById("r").innerText = r;
+    document.getElementById("v").innerText = data.views;
+    document.getElementById("r").innerText = data.runs;
+    document.getElementById("c").innerText = data.copies;
+}
 
+loadStats();
+
+async function run() {
+
+    let res = await fetch("/api/stats?type=run");
+    let data = await res.json();
+
+    document.getElementById("r").innerText = data.runs;
+
+    // 原本動畫照舊
     const out = document.getElementById("output");
     out.innerText = "";
 
     const lines = [
-        "Compiling source code...",
+        "gcc compiling...",
         "Checking syntax...",
-        "Linking libraries...",
         "Running program...",
         "",
-        "Generating output...",
-        "",
-        "  ♥     ♥",
-        " ♥♥♥   ♥♥♥",
-        "♥♥♥♥♥ ♥♥♥♥♥",
-        " ♥♥♥♥♥♥♥♥♥",
-        "  ♥♥♥♥♥♥♥",
-        "   ♥♥♥♥♥",
-        "    ♥♥♥",
+        "♥  ♥  ♥",
+        "  ♥♥♥",
+        "   ♥",
         "",
         "고마워요.",
         "음악 덕분에 행복했어요.",
-        "우리 음악으로 연결되어 있어요.",
-        "",
-        "See you again, LUCY ❤️"
+        "또 만나요 ❤️"
     ];
 
     let i = 0;
@@ -126,12 +129,15 @@ function run() {
         out.innerText += lines[i] + "\n";
         i++;
         if(i >= lines.length) clearInterval(timer);
-    }, 220);
+    }, 200);
 }
 
-function copy() {
-    c++;
-    document.getElementById("c").innerText = c;
+async function copy() {
+
+    let res = await fetch("/api/stats?type=copy");
+    let data = await res.json();
+
+    document.getElementById("c").innerText = data.copies;
 
     navigator.clipboard.writeText(document.querySelector("pre").innerText);
 
