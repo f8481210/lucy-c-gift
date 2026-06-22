@@ -295,10 +295,10 @@ void message() {
 <div class="feedback-section">
     <div class="feedback-title">✉️ 상엽오빠의 한마디 피드백 (중복 선택 가능!)</div>
     <div class="feedback-options">
-        <button class="fb-btn" id="fb1" onclick="toggleFeedback(1, '이런 방식 재밌어요 다음에도 또 해주세요')" disabled>이런 방식 재밌어요 다음에도 또 해주세요</button>
-        <button class="fb-btn" id="fb2" onclick="toggleFeedback(2, '기타 코드가 자연스럽다')" disabled>기타 코드가 자연스럽다</button>
-        <button class="fb-btn" id="fb3" onclick="toggleFeedback(3, '손편지가 더 좋다')" disabled>손편지가 더 좋다</button>
-        <button class="fb-btn" id="fb4" onclick="toggleFeedback(4, '기타가 기타처럼 안 보여요')" disabled>기타가 기타처럼 안 보여요</button> 
+        <button class="fb-btn" id="fb1" onclick="toggleFeedback(1, '이런 방식 재밌어요 다음에도 또 해주세요')">이런 방식 재밌어요 다음에도 또 해주세요</button>
+        <button class="fb-btn" id="fb2" onclick="toggleFeedback(2, '기타 코드가 자연스럽다')">기타 코드가 자연스럽다</button>
+        <button class="fb-btn" id="fb3" onclick="toggleFeedback(3, '손편지가 더 좋다')">손편지가 더 좋다</button>
+        <button class="fb-btn" id="fb4" onclick="toggleFeedback(4, '기타가 기타처럼 안 보여요')">기타가 기타처럼 안 보여요</button> 
     </div>
     
     <div class="comment-area">
@@ -325,6 +325,9 @@ let beatDuration = 60 / currentBpm;
 
 let selectedFeedbacks = {}; 
 
+// 🌟 移到最頂層：全域的 Google Apps Script 計數器部署網址
+const GAS_COUNTER_URL = "https://script.google.com/macros/s/AKfycbwKCE1UTZUWRWjAk0kqcOkT1A3YqxOmpICQJj6tm2sE7AuppURd470aS3epOw3xfWnG/exec";
+
 const NOTES = {
     C3: 130.81, D3: 146.83, E3: 164.81, F3: 174.61, G3: 196.00, A3: 220.00, B3: 246.94,
     C4: 261.63, D4: 293.66, E4: 329.63, F4: 349.23, G4: 392.00, A4: 440.00, B4: 493.88,
@@ -350,13 +353,13 @@ function updateAndRenderCounter(type) {
             document.getElementById("v").innerText = data.visits;
             document.getElementById("r").innerText = data.runs;
             
-            // 順便儲存到本地，避免網路延遲時畫面為空
+            // 儲存至本地快取
             localStorage.setItem("global_v", data.visits);
             localStorage.setItem("global_r", data.runs);
         })
         .catch(err => {
             console.error("Counter Error:", err);
-            // 斷網或出錯時的備援顯示
+            // 備援顯示
             document.getElementById("v").innerText = localStorage.getItem("global_v") || "0";
             document.getElementById("r").innerText = localStorage.getItem("global_r") || "0";
         });
@@ -364,7 +367,6 @@ function updateAndRenderCounter(type) {
 
 // 覆蓋原本的 render 函式
 function render() {
-    // 這裡我們直接用快取數值打底，真正的數值會由 API 刷新
     document.getElementById("v").innerText = localStorage.getItem("global_v") || "0";
     document.getElementById("r").innerText = localStorage.getItem("global_r") || "0";
 }
@@ -388,14 +390,12 @@ function checkFeedbackDraftStatus() {
     const hasSelected = Object.keys(selectedFeedbacks).length > 0;
     
     if (hasComment || hasSelected) {
-        // 只要手動輸入或點選，上面的執行按鈕就必須鎖死，強制點擊送出回饋
         document.getElementById("runBtn").disabled = true;
         document.getElementById("fbStatus").style.color = "#ff4a4a"; 
         document.getElementById("fbStatus").innerText = "⚠️ 작성 중인 피드백이 있습니다. 먼저 '피드백 보내기'를 눌러주세요! (請先點選送出回饋唷！)";
         
         window.onbeforeunload = function() { return "變更尚未儲存"; };
     } else {
-        // 回歸無勾選無文字狀態，若音樂沒放則恢復執行按鈕
         if (!playing) {
             document.getElementById("runBtn").disabled = false;
             document.getElementById("fbStatus").innerText = "";
@@ -419,7 +419,8 @@ function submitAllFeedback() {
     document.getElementById("fbStatus").style.color = "#00ffcc";
     document.getElementById("fbStatus").innerText = "선택이 완료되었습니다! 고마워요 오빠 ❤️";
 
-    const s = getStats();
+    const currentV = document.getElementById("v").innerText;
+    const currentR = document.getElementById("r").innerText;
     const nowTime = new Date().toLocaleString();
 
     // Google 表單傳送
@@ -433,8 +434,8 @@ function submitAllFeedback() {
     const formData = new FormData();
     formData.append(entryIdFeedback, combinedFeedbackText);
     formData.append(entryIdComment, commentText);
-    formData.append(entryIdRuns, s.r);
-    formData.append(entryIdVisits, s.v);
+    formData.append(entryIdRuns, currentR);
+    formData.append(entryIdVisits, currentV);
     formData.append(entryIdTime, nowTime);
 
     fetch(formUrl, {
@@ -481,9 +482,8 @@ function playGuitarTone(freq, startTime, duration, volume = 0.3) {
 function run(){
     if(playing) return; 
     
-    // 🌟 改成向全域資料庫發送執行 +1 請求
+    // 🌟 向全域資料庫發送執行 +1 請求
     updateAndRenderCounter("run");
-    render();
 
     if(!audioCtx){
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -491,8 +491,6 @@ function run(){
 
     playing = true;
     selectedFeedbacks = {}; 
-    // 🌟 貼上妳剛剛複製的 Google Apps Script 部署網址
-    const GAS_COUNTER_URL = "https://script.google.com/macros/s/AKfycbwKCE1UTZUWRWjAk0kqcOkT1A3YqxOmpICQJj6tm2sE7AuppURd470aS3epOw3xfWnG/exec";
     
     // 按下執行的瞬間，執行按鈕變黑（反灰鎖死），同時解鎖下方回饋區
     document.getElementById("runBtn").disabled = true;
