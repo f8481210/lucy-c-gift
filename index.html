@@ -35,7 +35,7 @@ button {
     font-family: monospace;
     transition: all 0.2s ease;
 }
-button:hover {
+button:hover:not(:disabled) {
     background: #ffffff;
     color: #0b0b0b;
     border-color: #fff;
@@ -43,7 +43,7 @@ button:hover {
 }
 button:disabled {
     background: #111;
-    color: #555;
+    color: #444;
     border-color: #222;
     cursor: not-allowed;
     box-shadow: none;
@@ -86,7 +86,6 @@ svg {
     height: 100%;
 }
 
-/* 彈奏時的發光動畫效果 */
 .vibe {
     transition: filter 0.3s ease;
 }
@@ -98,9 +97,111 @@ svg {
     transition: stroke 0.5s ease;
 }
 
+.feedback-section {
+    margin: 40px auto;
+    max-width: 600px;
+    background: #141414;
+    padding: 25px;
+    border-radius: 10px;
+    border: 1px solid #222;
+    text-align: left;
+}
+.feedback-title {
+    font-size: 14px;
+    color: #aaa;
+    margin-bottom: 15px;
+    text-align: center;
+}
+.feedback-options {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+.fb-btn {
+    background: #1c1c1c;
+    border: 1px solid #333;
+    padding: 10px 18px;
+    font-size: 14px;
+    border-radius: 20px;
+    color: #ccc;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.fb-btn:hover:not(:disabled) {
+    border-color: #00ffcc;
+    color: #fff;
+}
+.fb-btn.selected {
+    background: #00ffcc;
+    color: #0b0b0b;
+    border-color: #00ffcc;
+    font-weight: bold;
+    box-shadow: 0 0 12px rgba(0, 255, 204, 0.4);
+}
+
+/* 留言板樣式 */
+.comment-area {
+    margin-top: 20px;
+}
+.comment-label {
+    font-size: 13px;
+    color: #888;
+    margin-bottom: 8px;
+}
+.comment-input {
+    width: 100%;
+    background: #1c1c1c;
+    border: 1px solid #333;
+    border-radius: 6px;
+    padding: 12px;
+    color: #fff;
+    font-family: monospace;
+    font-size: 14px;
+    box-sizing: border-box;
+    resize: none;
+}
+.comment-input:focus {
+    outline: none;
+    border-color: #00ffcc;
+}
+.comment-input:disabled {
+    background: #111;
+    color: #444;
+    border-color: #222;
+    cursor: not-allowed;
+}
+
+.submit-container {
+    text-align: center;
+    margin-top: 20px;
+}
+#submitFbBtn {
+    background: #00ffcc;
+    color: #0b0b0b;
+    font-weight: bold;
+    border-color: #00ffcc;
+}
+#submitFbBtn:disabled {
+    background: #111;
+    color: #444;
+    border-color: #222;
+}
+
+#fbStatus {
+    margin-top: 15px;
+    font-size: 13px;
+    color: #00ffcc;
+    min-height: 18px;
+    text-align: center;
+}
+
 .stats {
-    margin-top:20px;
-    color:#ccc;
+    margin-top: 30px;
+    font-size: 13px;
+    color: #666; /* 科技感暗灰色，不搶眼但清晰可見 */
+    letter-spacing: 1px;
 }
 
 #introScreen {
@@ -111,40 +212,23 @@ svg {
 
 <body>
 
-<div id="introScreen" style="
-position:fixed;
-top:0;left:0;
-width:100%;height:100%;
-background:#0b0b0b;
-color:white;
-display:flex;
-align-items:center;
-justify-content:center;
-flex-direction:column;
-z-index:9999;
-font-family:monospace;
-">
-<div>INITIALIZING...</div>
-<div style="margin-top:10px;color:#aaa;">loading gift system</div>
+<div id="introScreen" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#0b0b0b; color:white; display:flex; align-items:center; justify-content:center; flex-direction:column; z-index:9999; font-family:monospace;">
+    <div>INITIALIZING...</div>
+    <div style="margin-top:10px;color:#aaa;">loading gift system</div>
 </div>
 
 <h2>🎁 20260623 — 상엽에게</h2> 
 <p class="small">C 언어 선물 프로그램</p>
 
 <pre>
-#include <stdio.h>
-
+#include &lt;stdio.h&gt;
 void heart();
 void message();
-
 int main() {
-
     heart();
     message();
-
     return 0;
 }
-
 void heart() {
     printf("   ***     ***   \n");
     printf("  *****   *****  \n");
@@ -154,11 +238,10 @@ void heart() {
     printf("     *******     \n");
     printf("       ***       \n");
 }
-
 void message() {
     printf("처음으로 코딩해서 이런 웹사이트를 만들었어요!😆 \n");
     printf("심지어 기타도 전부 코드로 직접 만든 거예요 🎸✨ \n");
-    printf("근데 제가 기타를 못 쳐서 코드가 맞는지 잘 모르겠어요 \n");
+    printf("근데 제가 기타을 못 쳐서 코드가 맞는지 잘 모르겠어요 \n");
     printf("전체 웹페이지는 약 3시간 정도 걸려서 완성했어요 \n");
     printf("상엽오빠한테 보여주고 싶어서 열심히 만들었어요ㅎㅎ \n");
     printf("저는 진짜 너무너무 마음에 들어요❤️ \n");
@@ -176,51 +259,23 @@ void message() {
     <div class="guitar-container" id="guitarWrapper">
         <svg viewBox="0 0 800 350" xmlns="http://www.w3.org/2000/svg">
             <g class="vibe">
-                <path id="bodyPath" d="M 360,175 
-                         C 360,105 310,75 250,75 
-                         C 190,75 195,115 165,115 
-                         C 135,115 110,65 60,65 
-                         C 10,65 10,285 60,285 
-                         C 110,285 135,235 165,235 
-                         C 195,235 190,275 250,275 
-                         C 310,275 360,245 360,175 Z" 
-                      fill="none" stroke="#ffffff" stroke-width="2.5"/>
-                
+                <path id="bodyPath" d="M 360,175 C 360,105 310,75 250,75 C 190,75 195,115 165,115 C 135,115 110,65 60,65 C 10,65 10,285 60,285 C 110,285 135,235 165,235 C 195,235 190,275 250,275 C 310,275 360,245 360,175 Z" fill="none" stroke="#ffffff" stroke-width="2.5"/>
                 <circle cx="275" cy="175" r="38" fill="#181818" stroke="#ffffff" stroke-width="1"/>
                 <circle cx="275" cy="175" r="34" fill="#0b0b0b" stroke="#ffffff" stroke-width="2"/>
                 <circle cx="275" cy="175" r="28" fill="#000000" stroke="#555555" stroke-width="1"/>
-
                 <rect x="110" y="140" width="15" height="70" rx="3" fill="#ffffff"/>
-                <circle cx="118" cy="148" r="1.5" fill="#111"/>
-                <circle cx="118" cy="159" r="1.5" fill="#111"/>
-                <circle cx="118" cy="170" r="1.5" fill="#111"/>
-                <circle cx="118" cy="181" r="1.5" fill="#111"/>
-                <circle cx="118" cy="192" r="1.5" fill="#111"/>
-                <circle cx="118" cy="203" r="1.5" fill="#111"/>
+                <circle cx="118" cy="148" r="1.5" fill="#111"/><circle cx="118" cy="159" r="1.5" fill="#111"/><circle cx="118" cy="170" r="1.5" fill="#111"/><circle cx="118" cy="181" r="1.5" fill="#111"/><circle cx="118" cy="192" r="1.5" fill="#111"/><circle cx="118" cy="203" r="1.5" fill="#111"/>
             </g>
-
             <rect x="360" y="161" width="300" height="28" fill="none" stroke="#ffffff" stroke-width="1.5"/>
-            
-            <path d="M 390,161 V 189 M 420,161 V 189 M 450,161 V 189 M 480,161 V 189 
-                     M 510,161 V 189 M 540,161 V 189 M 570,161 V 189 M 600,161 V 189 
-                     M 630,161 V 189 M 660,161 V 189" 
-                  stroke="#ffffff" stroke-width="1"/>
-
-            <circle cx="435" cy="175" r="2" fill="#ffffff"/>
-            <circle cx="495" cy="175" r="2" fill="#ffffff"/>
-            <circle cx="555" cy="175" r="2" fill="#ffffff"/>
-            <circle cx="615" cy="175" r="2" fill="#ffffff"/>
-
-            <path d="M 660,158 H 730 C 740,158 745,165 745,175 C 745,185 740,192 730,192 H 660 Z" 
-                  fill="none" stroke="#ffffff" stroke-width="2"/>
-
+            <path d="M 390,161 V 189 M 420,161 V 189 M 450,161 V 189 M 480,161 V 189 M 510,161 V 189 M 540,161 V 189 M 570,161 V 189 M 600,161 V 189 M 630,161 V 189 M 660,161 V 189" stroke="#ffffff" stroke-width="1"/>
+            <circle cx="435" cy="175" r="2" fill="#ffffff"/><circle cx="495" cy="175" r="2" fill="#ffffff"/><circle cx="555" cy="175" r="2" fill="#ffffff"/><circle cx="615" cy="175" r="2" fill="#ffffff"/>
+            <path d="M 660,158 H 730 C 740,158 745,165 745,175 C 745,185 740,192 730,192 H 660 Z" fill="none" stroke="#ffffff" stroke-width="2"/>
             <circle cx="680" cy="148" r="3" fill="#ffffff"/><line x1="680" y1="148" x2="680" y2="158" stroke="#fff" stroke-width="2"/>
             <circle cx="702" cy="148" r="3" fill="#ffffff"/><line x1="702" y1="148" x2="702" y2="158" stroke="#fff" stroke-width="2"/>
             <circle cx="724" cy="148" r="3" fill="#ffffff"/><line x1="724" y1="148" x2="724" y2="158" stroke="#fff" stroke-width="2"/>
             <circle cx="680" cy="202" r="3" fill="#ffffff"/><line x1="680" y1="202" x2="680" y2="192" stroke="#fff" stroke-width="2"/>
             <circle cx="702" cy="202" r="3" fill="#ffffff"/><line x1="702" y1="202" x2="702" y2="192" stroke="#fff" stroke-width="2"/>
             <circle cx="724" cy="202" r="3" fill="#ffffff"/><line x1="724" y1="202" x2="724" y2="192" stroke="#fff" stroke-width="2"/>
-
             <g id="stringsGroup">
                 <line id="s1" x1="118" y1="148" x2="680" y2="163" stroke="#ffffff" stroke-width="1.2"/>
                 <line id="s2" x1="118" y1="159" x2="702" y2="167" stroke="#ffffff" stroke-width="1.0"/>
@@ -233,103 +288,161 @@ void message() {
     </div>
 </div>
 
-<hr>
+<div class="feedback-section">
+    <div class="feedback-title">✉️ 상엽오빠의 한마디 피드백 (중복 선택 가능!)</div>
+    <div class="feedback-options">
+        <button class="fb-btn" id="fb1" onclick="toggleFeedback(1, '이런 방식 재밌어요 다음에도 또 해주세요')" disabled>이런 방식 재밌어요 다음에도 또 해주세요</button>
+        <button class="fb-btn" id="fb2" onclick="toggleFeedback(2, '기타 코드가 자연스럽다')" disabled>기타 코드가 자연스럽다</button>
+        <button class="fb-btn" id="fb3" onclick="toggleFeedback(3, '손편지가 더 좋다')" disabled>손편지가 더 좋다</button>
+        <button class="fb-btn" id="fb4" onclick="toggleFeedback(4, '기타가 기타처럼 안 보여요')" disabled>기타가 기타처럼 안 보여요</button> </div>
+    
+    <div class="comment-area">
+        <div class="comment-label">💬 오빠가 하고 싶은 말이나 다음에 보고 싶은 콘텐츠가 있나요? (선택사항)</div>
+        <textarea class="comment-input" id="commentInput" rows="3" placeholder="여기에 메시지를 입력해 주세요..." disabled></textarea>
+    </div>
+
+    <div class="submit-container">
+        <button id="submitFbBtn" onclick="submitAllFeedback()" disabled>피드백 보내기</button>
+    </div>
+
+    <div id="fbStatus"></div>
+</div>
 
 <div class="stats">
-<p>Runs: <span id="r">0</span></p>
+    <p>Visits: <span id="v">0</span> │ Runs: <span id="r">0</span></p>
 </div>
 
 <script>
-
-/////////////////////////////////////////////////
-// STATE
-/////////////////////////////////////////////////
-
 let audioCtx = null;
 let playing = false;
 let currentBpm = 85; 
-let beatDuration = 60 / currentBpm; // 一拍的時間(秒)
+let beatDuration = 60 / currentBpm; 
 
-// 定義高精度音符頻率
+// 用來儲存目前被勾選的複選資料
+let selectedFeedbacks = {}; 
+
 const NOTES = {
     C3: 130.81, D3: 146.83, E3: 164.81, F3: 174.61, G3: 196.00, A3: 220.00, B3: 246.94,
     C4: 261.63, D4: 293.66, E4: 329.63, F4: 349.23, G4: 392.00, A4: 440.00, B4: 493.88,
     C5: 523.25, D5: 587.33, E5: 659.25, F5: 698.46, G5: 783.99, A5: 880.00
 };
 
-// 卡農風格的溫暖和弦與指彈編曲進行
-// 每個小節含有 [根音/低音, 弦3音, 弦2音, 弦1高音] 分時段彈奏
 const SONG_DATA = [
-    // 1. C Major
     { bass: NOTES.C3, treble: [NOTES.E4, NOTES.G4, NOTES.C5], label: "C Major" },
-    // 2. G Major
     { bass: NOTES.G3, treble: [NOTES.D4, NOTES.G4, NOTES.B4], label: "G Major" },
-    // 3. A Minor
     { bass: NOTES.A3, treble: [NOTES.E4, NOTES.A4, NOTES.C5], label: "A Minor" },
-    // 4. E Minor
     { bass: NOTES.E3, treble: [NOTES.G4, NOTES.B4, NOTES.E5], label: "E Minor" },
-    // 5. F Major
     { bass: NOTES.F3, treble: [NOTES.A4, NOTES.C5, NOTES.F5], label: "F Major" },
-    // 6. C Major
     { bass: NOTES.C3, treble: [NOTES.E4, NOTES.G4, NOTES.C5], label: "C Major" },
-    // 7. F Major / G
     { bass: NOTES.F3, treble: [NOTES.A4, NOTES.C5, NOTES.F5], label: "F Major" },
-    // 8. G Major (結束式)
     { bass: NOTES.G3, treble: [NOTES.B4, NOTES.D5, NOTES.G5], label: "G Major" }
 ];
 
 function getStats(){
-    return { r: Number(localStorage.getItem("r") || 0) };
+    return {
+        r: Number(localStorage.getItem("r") || 0),
+        v: Number(localStorage.getItem("v") || 0)
+    };
 }
 function saveStats(s){
     localStorage.setItem("r", s.r);
+    localStorage.setItem("v", s.v);
 }
 function render(){
     const s = getStats();
     document.getElementById("r").innerText = s.r;
+    document.getElementById("v").innerText = s.v; // 補上這行：更新開啟網頁次數
 }
 
-/////////////////////////////////////////////////
-// 木吉他物理建模音色合成器
-/////////////////////////////////////////////////
+// 複選切換邏輯：點一下亮，再點一下滅
+function toggleFeedback(id, textValue) {
+    const btn = document.getElementById(`fb${id}`);
+    if (selectedFeedbacks[id]) {
+        delete selectedFeedbacks[id];
+        btn.classList.remove('selected');
+    } else {
+        selectedFeedbacks[id] = textValue;
+        btn.classList.add('selected');
+    }
+}
+
+// 點擊「送出回饋」按鈕觸發
+function submitAllFeedback() {
+    // 取得所有選取的項目並用逗號組合
+    const valuesArray = Object.values(selectedFeedbacks);
+    if(valuesArray.length === 0) {
+        document.getElementById("fbStatus").innerText = "⚠️ 피드백을 최소 하나 이상 선택해 주세요!";
+        return;
+    }
+    const combinedFeedbackText = valuesArray.join(', ');
+    
+    // 取得非必填留言內容
+    let commentText = document.getElementById("commentInput").value.trim();
+    if(!commentText) commentText = "(無留言)";
+
+    document.getElementById("fbStatus").innerText = "선택이 완료되었습니다!";
+
+    const s = getStats();
+    const nowTime = new Date().toLocaleString();
+
+    // ⚠️【請在下方替換妳的 Google 表單資訊】⚠️
+    const formUrl = "https://docs.google.com/forms/u/0/d/1nf2Ppq0N1tViE6q0IXoTnN0G9TOgLPAwDqmJ3iV66qg/formResponse";
+    const entryIdFeedback = "entry.1743892404"; // 1. 回饋內容 (必填)
+    const entryIdComment  = "entry.843652598";  // 2. 額外想說的話 (選填)
+    const entryIdRuns     = "entry.473987453";  // 3. 這是第幾次玩（執行次數）(必填)
+    const entryIdVisits   = "entry.1014475186"; // 4. 進入網頁的次數 (必填)
+    const entryIdTime     = "entry.1840065408"; // 5. 發送當下的網頁時間 (必填)
+
+    const formData = new FormData();
+    formData.append(entryIdFeedback, combinedFeedbackText);
+    formData.append(entryIdComment, commentText);
+    formData.append(entryIdRuns, s.r);
+    formData.append(entryIdVisits, s.v);
+    formData.append(entryIdTime, nowTime);
+
+    fetch(formUrl, {
+        method: "POST",
+        mode: "no-cors",
+        body: formData
+    }).catch(err => console.log("Sent"));
+
+    // 解鎖執行按鈕，讓他玩下一次
+    document.getElementById("runBtn").disabled = false;
+    
+    // 鎖死回饋區的所有操作，直到下次播完音樂
+    setFeedbackAreaDisabled(true);
+}
+
+function setFeedbackAreaDisabled(disabledState) {
+    const buttons = document.querySelectorAll('.fb-btn');
+    buttons.forEach(btn => btn.disabled = disabledState);
+    document.getElementById("commentInput").disabled = disabledState;
+    document.getElementById("submitFbBtn").disabled = disabledState;
+}
 
 function playGuitarTone(freq, startTime, duration, volume = 0.3) {
     if (!audioCtx) return;
-
     const osc = audioCtx.createOscillator();
     const gainNode = audioCtx.createGain();
-    
-    // 木吉他常用低通濾波器來濾除尖銳高音，保留木頭箱體的溫暖共鳴
     const filter = audioCtx.createBiquadFilter();
     filter.type = "lowpass";
-    // 讓剛撥弦時明亮，隨後變暗淡
     filter.frequency.setValueAtTime(2000, startTime);
     filter.frequency.exponentialRampToValueAtTime(300, startTime + duration);
-
-    // 吉他撥弦使用三角波模擬柔和的尼龍或鋼弦質感
     osc.type = "triangle";
     osc.frequency.setValueAtTime(freq, startTime);
-
-    // 模擬吉他 ADSR 曲線 (瞬態爆發力與隨後的自然衰減)
     gainNode.gain.setValueAtTime(0.0001, startTime);
-    gainNode.gain.linearRampToValueAtTime(volume, startTime + 0.01); // 撥弦的一瞬間
+    gainNode.gain.linearRampToValueAtTime(volume, startTime + 0.01); 
     gainNode.gain.exponentialRampToValueAtTime(volume * 0.5, startTime + 0.1); 
-    gainNode.gain.exponentialRampToValueAtTime(0.0001, startTime + duration); // 餘音淡出
-
+    gainNode.gain.exponentialRampToValueAtTime(0.0001, startTime + duration); 
     osc.connect(filter);
     filter.connect(gainNode);
     gainNode.connect(audioCtx.destination);
-
     osc.start(startTime);
     osc.stop(startTime + duration + 0.1);
 }
 
-/////////////////////////////////////////////////
-// 樂曲調度排程與動畫控制
-/////////////////////////////////////////////////
-
 function run(){
-    if(playing) return; // 防止重複點擊
+    if(playing) return; 
     
     const s = getStats();
     s.r++;
@@ -341,46 +454,45 @@ function run(){
     }
 
     playing = true;
+    selectedFeedbacks = {}; // 清空上輪被選取的項目
+    
+    // 播歌期間：鎖死執行按鈕
     document.getElementById("runBtn").disabled = true;
+    document.getElementById("fbStatus").innerText = ""; 
+    document.getElementById("commentInput").value = ""; // 清空上輪輸入
+    
+    const buttons = document.querySelectorAll('.fb-btn');
+    buttons.forEach(btn => btn.classList.remove('selected'));
+
     document.getElementById("guitarWrapper").classList.add("playing");
 
     const now = audioCtx.currentTime;
-    let timeCursor = now + 0.2; // 給點小緩衝
-
-    // 建立整首歌的排程 (2遍循環，打造一段精緻的小樂曲)
+    let timeCursor = now + 0.2; 
     const totalLoops = 2;
-    let currentChordIndex = 0;
 
     for (let loop = 0; loop < totalLoops; loop++) {
         SONG_DATA.forEach((chord) => {
-            
-            // 每一小節 4 拍的 T1232123 指彈吉他分解和弦 (Arpeggio)
             const pattern = [
-                { time: 0,           freq: chord.bass,      vol: 0.35, len: beatDuration * 1.5 }, // 根音 (重拍)
-                { time: beatDuration * 0.5,  freq: chord.treble[0], vol: 0.20, len: beatDuration },       // 3弦
-                { time: beatDuration * 1.0,  freq: chord.treble[1], vol: 0.22, len: beatDuration },       // 2弦
-                { time: beatDuration * 1.5,  freq: chord.treble[2], vol: 0.25, len: beatDuration * 2 },   // 1弦 (主旋律高音)
-                { time: beatDuration * 2.0,  freq: chord.treble[1], vol: 0.20, len: beatDuration },       // 2弦
-                { time: beatDuration * 2.5,  freq: chord.treble[0], vol: 0.18, len: beatDuration },       // 3弦
-                { time: beatDuration * 3.0,  freq: chord.treble[1], vol: 0.22, len: beatDuration }        // 2弦
+                { time: 0,           freq: chord.bass,      vol: 0.35, len: beatDuration * 1.5 }, 
+                { time: beatDuration * 0.5,  freq: chord.treble[0], vol: 0.20, len: beatDuration },       
+                { time: beatDuration * 1.0,  freq: chord.treble[1], vol: 0.22, len: beatDuration },       
+                { time: beatDuration * 1.5,  freq: chord.treble[2], vol: 0.25, len: beatDuration * 2 },   
+                { time: beatDuration * 2.0,  freq: chord.treble[1], vol: 0.20, len: beatDuration },       
+                { time: beatDuration * 2.5,  freq: chord.treble[0], vol: 0.18, len: beatDuration },       
+                { time: beatDuration * 3.0,  freq: chord.treble[1], vol: 0.22, len: beatDuration }        
             ];
-
             pattern.forEach(note => {
                 playGuitarTone(note.freq, timeCursor + note.time, note.len, note.vol);
             });
-
-            // 設定文字和弦變更的排程時間點
             const displayTime = (timeCursor - now) * 1000;
             const labelText = chord.label;
             setTimeout(() => {
                 if(playing) document.getElementById("output").innerText = `Playing: ${labelText} 🎶`;
             }, displayTime);
-
-            timeCursor += beatDuration * 4; // 邁入下一小節
+            timeCursor += beatDuration * 4; 
         });
     }
 
-    // 結尾最完美的最終刷弦 (C Major Chord Burst)
     const finalTime = timeCursor;
     playGuitarTone(NOTES.C3, finalTime, beatDuration * 4, 0.35);
     playGuitarTone(NOTES.E4, finalTime + 0.03, beatDuration * 4, 0.25);
@@ -391,7 +503,6 @@ function run(){
         document.getElementById("output").innerText = `Ending: C Major Chord 🌊`;
     }, (finalTime - now) * 1000);
 
-    // 琴弦物理動態震動動畫
     const strings = [
         document.getElementById("s1"), document.getElementById("s2"),
         document.getElementById("s3"), document.getElementById("s4"),
@@ -404,43 +515,38 @@ function run(){
 
     function drawFrame() {
         animFrame++;
-        // 讓琴弦隨著音樂時間波形產生不規則的正弦微震幅
         const offset = Math.sin(animFrame * 0.6) * 1.8;
-        
         strings.forEach((str, idx) => {
             const side = idx % 2 === 0 ? 1 : -1;
             str.setAttribute("y2", defaultY2[idx] + (offset * side));
         });
-
-        if (playing) {
-            requestAnimationFrame(drawFrame);
-        }
+        if (playing) requestAnimationFrame(drawFrame);
     }
     requestAnimationFrame(drawFrame);
 
-    // 音樂結束後的重置排程
+    // 音樂結束：這時候才把回饋、留言、送出按鈕全部解除反灰！
     setTimeout(() => {
         playing = false;
-        strings.forEach((str, idx) => str.setAttribute("y2", defaultY2[idx])); // 歸位
+        strings.forEach((str, idx) => str.setAttribute("y2", defaultY2[idx])); 
         document.getElementById("guitarWrapper").classList.remove("playing");
-        document.getElementById("runBtn").disabled = false;
         document.getElementById("output").innerText = "Song finished. Done. ✨";
+        
+        setFeedbackAreaDisabled(false);
+        document.getElementById("fbStatus").innerText = "💬 피드백을 선택하고 의견을 남겨주시면 다음 곡을 들을 수 있어요!";
     }, totalDurationMs);
 }
 
-/////////////////////////////////////////////////
-// INIT
-/////////////////////////////////////////////////
-
 window.addEventListener("DOMContentLoaded", () => {
+    const s = getStats();
+    s.v++; 
+    saveStats(s);
+    render();
+
     setTimeout(()=>{
         document.getElementById("introScreen").style.opacity = "0";
         setTimeout(()=>document.getElementById("introScreen").remove(),500);
     },1000);
-
-    render();
 });
-
 </script>
 
 </body>
