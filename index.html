@@ -116,6 +116,27 @@ p{
     color:#777;
     font-size:12px;
 }
+.card{
+    position:relative;
+    overflow:hidden;
+}
+
+/* 💡 spotlight flash */
+.card.flash::before{
+    content:"";
+    position:absolute;
+    top:-50%;
+    left:-50%;
+    width:200%;
+    height:200%;
+    background:radial-gradient(circle, rgba(255,255,255,0.25), transparent 60%);
+    animation:flash 0.2s ease;
+}
+
+@keyframes flash{
+    from{opacity:1;}
+    to{opacity:0;}
+}
 </style>
 </head>
 
@@ -148,48 +169,56 @@ function play(){
 
     const card = document.querySelector(".card");
 
-    // ===== visual animation =====
+    // 💡 stage light flash
+    card.classList.add("flash");
+    setTimeout(()=> card.classList.remove("flash"), 200);
+
+    // 🎸 animation
     card.classList.add("playing");
+    setTimeout(() => card.classList.remove("playing"), 900);
 
-    setTimeout(() => {
-        card.classList.remove("playing");
-    }, 700);
-
-    // ===== sound (Web Audio API) =====
-    playPluckSound();
+    // 🎵 chord sound
+    playChord();
 }
 
-function playPluckSound(){
+function playChord(){
 
-    // 初始化 audio context（第一次點擊才建立）
     if(!audioCtx){
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     }
 
     const now = audioCtx.currentTime;
 
-    // 做 3~5 個「撥弦音」
-    for(let i=0;i<4;i++){
+    // 🎼 三個和弦：C / G / Am（簡化版）
+    const chords = [
+        [261.63, 329.63, 392.00], // C
+        [196.00, 246.94, 392.00], // G
+        [220.00, 261.63, 329.63], // Am
+    ];
+
+    const chord = chords[Math.floor(Math.random() * chords.length)];
+
+    chord.forEach((freq, i) => {
 
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
 
         osc.type = "triangle";
+        osc.frequency.value = freq;
 
-        // 模擬不同弦音（頻率）
-        osc.frequency.value = 220 + i * 60;
+        // 🎧 pluck envelope
+        const t = now + i * 0.05;
 
-        // 音量包絡（很重要，不然會刺耳）
-        gain.gain.setValueAtTime(0.0001, now + i*0.03);
-        gain.gain.exponentialRampToValueAtTime(0.2, now + i*0.03 + 0.01);
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + i*0.03 + 0.4);
+        gain.gain.setValueAtTime(0.0001, t);
+        gain.gain.exponentialRampToValueAtTime(0.25, t + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.6);
 
         osc.connect(gain);
         gain.connect(audioCtx.destination);
 
-        osc.start(now + i*0.03);
-        osc.stop(now + i*0.03 + 0.5);
-    }
+        osc.start(t);
+        osc.stop(t + 0.7);
+    });
 }
 
 </script>
