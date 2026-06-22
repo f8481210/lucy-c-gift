@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>20260623 — gift</title>
-<canvas id="art"></canvas>
+<title>20260623 — 상엽에게</title>
+
 <style>
 body {
     background:#0b0b0b;
@@ -30,9 +30,23 @@ button {
 
 #output {
     margin-top:20px;
-    min-height:200px;
+    min-height:120px;
     text-align:left;
-    white-space:pre;
+    white-space:pre-line;
+}
+
+#stage {
+    margin-top:30px;
+    display:flex;
+    justify-content:center;
+}
+
+canvas {
+    background:#111;
+    border-radius:12px;
+    width:100%;
+    max-width:700px;
+    border:1px solid #333;
 }
 
 .small { color:#aaa; }
@@ -44,14 +58,6 @@ button {
 
 #introScreen {
     transition: opacity 0.5s ease;
-}
-    canvas {
-    margin-top:20px;
-    background:#111;
-    border-radius:10px;
-    width:100%;
-    max-width:700px;
-    height:auto;
 }
 </style>
 </head>
@@ -75,23 +81,49 @@ font-family:monospace;
 <div style="margin-top:10px;color:#aaa;">loading gift system</div>
 </div>
 
-<h2>🎁 20260623</h2>
-<p class="small">ASCII instrument generator</p>
+<h2>🎁 20260623 — 상엽에게</h2> 
+<p class="small">C 언어 선물 프로그램</p>
 
-<pre>
+<pre> 
 #include <stdio.h>
 
+void heart();
+void message();
+
 int main() {
-    printf("Loading...\n");
-    printf("Run program...\n");
+
+    heart();
+    message();
+
     return 0;
 }
+
+void heart() {
+    printf("  ***     *** \n");
+    printf("******* ******* \n");
+    printf(" *************  \n");
+    printf("  ***********   \n");
+    printf("    *******     \n");
+    printf("      ***       \n");
+}
+
+void message() {
+    printf("\n");
+    printf("KOREA → TAIWAN LINK\n\n");
+    printf("고마워요.\n");
+    printf("음악 덕분에 행복했어요.\n");
+    printf("또 만나요 ❤️\n");
+}
+
 </pre>
 
 <button onclick="run()">실행</button>
-<button onclick="copy()">복사</button>
 
 <div id="output"></div>
+
+<div id="stage">
+    <canvas id="art"></canvas>
+</div>
 
 <hr>
 
@@ -136,115 +168,75 @@ function addView(){
 }
 
 /////////////////////////////////////////////////
-// ASCII ENGINE (responsive)
-/////////////////////////////////////////////////
-
-function getWidthScale() {
-    return Math.max(30, Math.min(80, Math.floor(window.innerWidth / 12)));
-}
-
-function makeGuitar() {
-    const w = getWidthScale();
-    let out = "";
-
-    out += " ".repeat(w * 0.2) + "🎸 GUITAR\n\n";
-
-    // head
-    out += " ".repeat(w * 0.25) + "||====||\n";
-    out += " ".repeat(w * 0.25) + "||====||\n";
-
-    // neck
-    for (let i = 0; i < 4; i++) {
-        out += " ".repeat(w * 0.28) + "||    ||\n";
-    }
-
-    // body
-    out += " ".repeat(w * 0.2) + "  _________\n";
-    out += " ".repeat(w * 0.2) + " /         \\\n";
-    out += " ".repeat(w * 0.2) + "/  GUITAR   \\\n";
-    out += " ".repeat(w * 0.2) + "\\           /\n";
-    out += " ".repeat(w * 0.2) + " \\_________/\n";
-
-    return out;
-}
-
-function makeMic() {
-    const w = getWidthScale();
-    let out = "\n";
-
-    out += " ".repeat(w * 0.3) + "🎤 MICROPHONE\n\n";
-
-    out += " ".repeat(w * 0.35) + " ___ \n";
-    out += " ".repeat(w * 0.35) + "|   |\n";
-    out += " ".repeat(w * 0.35) + "|   |\n";
-    out += " ".repeat(w * 0.35) + "|___|\n";
-    out += " ".repeat(w * 0.37) + " | |\n";
-    out += " ".repeat(w * 0.37) + " | |\n";
-    out += " ".repeat(w * 0.36) + " /   \\\n";
-    out += " ".repeat(w * 0.35) + "/_____\\\n";
-
-    return out;
-}
-
-/////////////////////////////////////////////////
-// RUN
+// DRAWING ENGINE
 /////////////////////////////////////////////////
 
 function drawGuitar(ctx, w, h) {
 
     ctx.strokeStyle = "#fff";
-    ctx.lineWidth = 3;
+    ctx.lineWidth = 4;
 
     // neck
     ctx.beginPath();
-    ctx.moveTo(w * 0.5, h * 0.1);
-    ctx.lineTo(w * 0.5, h * 0.6);
+    ctx.moveTo(w * 0.52, h * 0.05);
+    ctx.lineTo(w * 0.55, h * 0.55);
     ctx.stroke();
 
     // head
     ctx.fillStyle = "#fff";
-    ctx.fillRect(w * 0.47, h * 0.05, w * 0.06, h * 0.06);
+    ctx.fillRect(w * 0.50, h * 0.02, w * 0.08, h * 0.05);
 
-    // body (simple circle)
+    // body
     ctx.beginPath();
-    ctx.arc(w * 0.5, h * 0.75, w * 0.18, 0, Math.PI * 2);
+    ctx.moveTo(w * 0.45, h * 0.55);
+
+    ctx.quadraticCurveTo(w * 0.35, h * 0.60, w * 0.40, h * 0.70);
+    ctx.quadraticCurveTo(w * 0.30, h * 0.85, w * 0.50, h * 0.88);
+    ctx.quadraticCurveTo(w * 0.70, h * 0.85, w * 0.60, h * 0.70);
+    ctx.quadraticCurveTo(w * 0.65, h * 0.60, w * 0.55, h * 0.55);
+
+    ctx.closePath();
     ctx.stroke();
 
     // sound hole
     ctx.beginPath();
-    ctx.arc(w * 0.5, h * 0.75, w * 0.06, 0, Math.PI * 2);
+    ctx.arc(w * 0.5, h * 0.72, w * 0.06, 0, Math.PI * 2);
     ctx.stroke();
 }
 
 function drawMic(ctx, w, h) {
 
     ctx.strokeStyle = "#fff";
-    ctx.lineWidth = 3;
+    ctx.lineWidth = 4;
 
-    // head
+    // mic head
     ctx.beginPath();
-    ctx.arc(w * 0.5, h * 0.2, w * 0.08, 0, Math.PI * 2);
+    ctx.arc(w * 0.5, h * 0.15, w * 0.07, 0, Math.PI * 2);
     ctx.stroke();
 
     // body
     ctx.beginPath();
-    ctx.moveTo(w * 0.5, h * 0.28);
-    ctx.lineTo(w * 0.5, h * 0.65);
+    ctx.moveTo(w * 0.5, h * 0.22);
+    ctx.lineTo(w * 0.5, h * 0.55);
     ctx.stroke();
 
     // stand
     ctx.beginPath();
-    ctx.moveTo(w * 0.5, h * 0.65);
-    ctx.lineTo(w * 0.35, h * 0.9);
+    ctx.moveTo(w * 0.5, h * 0.55);
+    ctx.lineTo(w * 0.35, h * 0.85);
     ctx.stroke();
 
     ctx.beginPath();
-    ctx.moveTo(w * 0.5, h * 0.65);
-    ctx.lineTo(w * 0.65, h * 0.9);
+    ctx.moveTo(w * 0.5, h * 0.55);
+    ctx.lineTo(w * 0.65, h * 0.85);
     ctx.stroke();
 }
 
-function run() {
+/////////////////////////////////////////////////
+// RUN
+/////////////////////////////////////////////////
+
+function run(){
 
     const s = getStats();
     s.r++;
@@ -254,8 +246,8 @@ function run() {
     const canvas = document.getElementById("art");
     const ctx = canvas.getContext("2d");
 
-    // 自適應尺寸（關鍵）
     const size = Math.min(window.innerWidth * 0.8, 600);
+
     canvas.width = size;
     canvas.height = size;
 
@@ -268,10 +260,7 @@ function run() {
 
         ctx.clearRect(0, 0, size, size);
 
-        // 上半部：吉他
         drawGuitar(ctx, size, size);
-
-        // 下半部：麥克風
         drawMic(ctx, size, size);
 
         out.innerHTML = "done.";
@@ -280,28 +269,11 @@ function run() {
 }
 
 /////////////////////////////////////////////////
-// COPY
-/////////////////////////////////////////////////
-
-function copy(){
-
-    const s = getStats();
-    s.c++;
-    saveStats(s);
-    render();
-
-    navigator.clipboard.writeText(
-        document.querySelector("pre").innerText
-    );
-
-    alert("Copied.");
-}
-
-/////////////////////////////////////////////////
 // INIT
 /////////////////////////////////////////////////
 
 window.addEventListener("DOMContentLoaded", () => {
+
     setTimeout(() => {
         const el = document.getElementById("introScreen");
         el.style.opacity = "0";
