@@ -2,294 +2,157 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>20260623 — 상엽에게</title>
+<title>20260623 — gift</title>
 
 <style>
-body {
+body{
+    margin:0;
     background:#0b0b0b;
-    color:#fff;
-    font-family: monospace;
-    text-align:center;
+    color:white;
+    font-family:monospace;
+    display:flex;
+    justify-content:center;
     padding:30px;
 }
 
-pre {
-    background:#1c1c1c;
-    padding:15px;
-    text-align:left;
-    overflow-x:auto;
-    border-radius:8px;
-    white-space:pre;
+.wrap{
+    width:min(90vw, 420px);
+    text-align:center;
 }
 
-button {
-    padding:10px 20px;
-    margin:10px;
-    cursor:pointer;
+h2{
+    margin-bottom:10px;
 }
 
-#output {
+.card{
     margin-top:20px;
-    min-height:120px;
-    text-align:left;
-    white-space:pre-line;
-}
-
-#stage {
-    margin-top:30px;
-    display:flex;
-    justify-content:center;
-}
-
-canvas {
+    padding:20px;
     background:#111;
-    border-radius:12px;
-    width:100%;
-    max-width:420px;
-    aspect-ratio: 3 / 4;
-    border:1px solid #333;
+    border-radius:18px;
+    cursor:pointer;
+    user-select:none;
+    transition:0.3s;
 }
 
-.small { color:#aaa; }
-
-.stats {
-    margin-top:20px;
-    color:#ccc;
+.card:active{
+    transform:scale(0.98);
 }
 
-#introScreen {
-    transition: opacity 0.5s ease;
+/* 🎸 guitar container */
+.guitar{
+    position:relative;
+    height:220px;
+}
+
+/* body */
+.body{
+    position:absolute;
+    left:50%;
+    bottom:10px;
+    transform:translateX(-50%);
+    width:120px;
+    height:120px;
+    border-radius:50%;
+    border:2px solid white;
+    transition:0.2s;
+}
+
+/* neck */
+.neck{
+    position:absolute;
+    left:50%;
+    top:0;
+    transform:translateX(-50%);
+    width:6px;
+    height:110px;
+    background:white;
+}
+
+/* strings */
+.strings{
+    position:absolute;
+    left:50%;
+    top:10px;
+    transform:translateX(-50%);
+    width:2px;
+    height:180px;
+    background:repeating-linear-gradient(
+        to bottom,
+        white,
+        white 3px,
+        transparent 3px,
+        transparent 10px
+    );
+}
+
+/* 🎸 animation */
+.card.playing .body{
+    animation:shake 0.15s infinite;
+}
+
+.card.playing .strings{
+    animation:pluck 0.2s infinite;
+}
+
+@keyframes shake{
+    0%{ transform:translateX(-50%) rotate(-2deg);}
+    50%{ transform:translateX(-50%) rotate(2deg);}
+    100%{ transform:translateX(-50%) rotate(-2deg);}
+}
+
+@keyframes pluck{
+    0%{ transform:translateX(-50%) translateY(0);}
+    50%{ transform:translateX(-50%) translateY(-2px);}
+    100%{ transform:translateX(-50%) translateY(0);}
+}
+
+p{
+    margin-top:15px;
+    color:#aaa;
+    font-size:14px;
+}
+
+.small{
+    color:#777;
+    font-size:12px;
 }
 </style>
 </head>
 
 <body>
 
-<div id="introScreen" style="
-position:fixed;
-top:0;left:0;
-width:100%;height:100%;
-background:#0b0b0b;
-color:white;
-display:flex;
-align-items:center;
-justify-content:center;
-flex-direction:column;
-z-index:9999;
-font-family:monospace;
-">
-<div>INITIALIZING...</div>
-<div style="margin-top:10px;color:#aaa;">loading gift system</div>
-</div>
+<div class="wrap">
 
-<h2>🎁 20260623 — 상엽에게</h2> 
-<p class="small">C 언어 선물 프로그램</p>
+    <h2>🎁 20260623</h2>
+    <div class="small">a small interactive gift</div>
 
-<pre> 
-#include <stdio.h>
+    <div class="card" onclick="play()">
 
-void heart();
-void message();
+        <div class="guitar">
+            <div class="neck"></div>
+            <div class="body"></div>
+            <div class="strings"></div>
+        </div>
 
-int main() {
-    heart();
-    message();
-    return 0;
-}
+        <p>tap to play 🎸</p>
 
-void heart() {
-    printf("  ***     *** \n");
-    printf("******* ******* \n");
-    printf(" *************  \n");
-    printf("  ***********   \n");
-    printf("    *******     \n");
-    printf("      ***       \n");
-}
+    </div>
 
-void message() {
-    printf("\n");
-    printf("KOREA → TAIWAN LINK\n\n");
-    printf("고마워요.\n");
-    printf("음악 덕분에 행복했어요.\n");
-    printf("또 만나요 ❤️\n");
-}
-</pre>
-
-<button onclick="run()">실행</button>
-
-<div id="output"></div>
-
-<div id="stage">
-    <canvas id="art"></canvas>
-</div>
-
-<hr>
-
-<div class="stats">
-<p>Views: <span id="v">0</span></p>
-<p>Runs: <span id="r">0</span></p>
-<p>Copies: <span id="c">0</span></p>
 </div>
 
 <script>
 
-/////////////////////////////////////////////////
-// STATS
-/////////////////////////////////////////////////
+function play(){
 
-function getStats(){
-    return {
-        v: Number(localStorage.getItem("v") || 0),
-        r: Number(localStorage.getItem("r") || 0),
-        c: Number(localStorage.getItem("c") || 0),
-    };
-}
+    const card = document.querySelector(".card");
 
-function saveStats(s){
-    localStorage.setItem("v", s.v);
-    localStorage.setItem("r", s.r);
-    localStorage.setItem("c", s.c);
-}
+    card.classList.add("playing");
 
-function render(){
-    const s = getStats();
-    document.getElementById("v").innerText = s.v;
-    document.getElementById("r").innerText = s.r;
-    document.getElementById("c").innerText = s.c;
-}
-
-function addView(){
-    const s = getStats();
-    s.v++;
-    saveStats(s);
-    render();
-}
-
-/////////////////////////////////////////////////
-// ANIMATION STATE
-/////////////////////////////////////////////////
-
-let animFrame = 0;
-let playing = false;
-
-/////////////////////////////////////////////////
-// DRAWING ENGINE
-/////////////////////////////////////////////////
-
-function drawGuitar(ctx, w, h) {
-
-    ctx.strokeStyle = "#fff";
-    ctx.lineWidth = 3;
-
-    // neck
-    ctx.beginPath();
-    ctx.moveTo(w * 0.52, h * 0.05);
-    ctx.lineTo(w * 0.55, h * 0.55);
-    ctx.stroke();
-
-    // head
-    ctx.fillStyle = "#fff";
-    ctx.fillRect(w * 0.50, h * 0.02, w * 0.08, h * 0.05);
-
-    // body
-    ctx.beginPath();
-    ctx.moveTo(w * 0.45, h * 0.55);
-
-    ctx.quadraticCurveTo(w * 0.32, h * 0.62, w * 0.40, h * 0.72);
-    ctx.quadraticCurveTo(w * 0.28, h * 0.86, w * 0.50, h * 0.90);
-    ctx.quadraticCurveTo(w * 0.72, h * 0.86, w * 0.60, h * 0.72);
-    ctx.quadraticCurveTo(w * 0.68, h * 0.62, w * 0.55, h * 0.55);
-
-    ctx.closePath();
-    ctx.stroke();
-
-    // sound hole
-    ctx.beginPath();
-    ctx.arc(w * 0.5, h * 0.75, w * 0.06, 0, Math.PI * 2);
-    ctx.stroke();
-
-    // 🎸 strings (animated)
-    const baseY = h * 0.58;
-
-    for (let i = 0; i < 5; i++) {
-
-        const offset = playing ? Math.sin(animFrame * 0.35 + i) * 4 : 0;
-
-        ctx.beginPath();
-        ctx.moveTo(w * 0.48, baseY + i * 8);
-        ctx.lineTo(w * 0.58, h * 0.12 + i * 8 + offset);
-        ctx.stroke();
-    }
-
-    // glow when playing
-    if (playing) {
-        ctx.fillStyle = "rgba(255,255,255,0.06)";
-        ctx.beginPath();
-        ctx.arc(w * 0.5, h * 0.75, w * 0.28, 0, Math.PI * 2);
-        ctx.fill();
-    }
-}
-
-/////////////////////////////////////////////////
-// RUN (ANIMATION)
-/////////////////////////////////////////////////
-
-function run(){
-
-    const s = getStats();
-    s.r++;
-    saveStats(s);
-    render();
-
-    const canvas = document.getElementById("art");
-    const ctx = canvas.getContext("2d");
-
-    const w = Math.min(window.innerWidth * 0.8, 420);
-    const h = w * 1.3;
-
-    canvas.width = w;
-    canvas.height = h;
-
-    const out = document.getElementById("output");
-    out.innerHTML = "playing... 🎸";
-
-    playing = true;
-    animFrame = 0;
-
-    function animate(){
-
-        ctx.clearRect(0, 0, w, h);
-
-        drawGuitar(ctx, w, h);
-
-        animFrame++;
-
-        if (animFrame < 45) {
-            requestAnimationFrame(animate);
-        } else {
-            playing = false;
-            out.innerHTML = "done.";
-        }
-    }
-
-    animate();
-}
-
-/////////////////////////////////////////////////
-// INIT
-/////////////////////////////////////////////////
-
-window.addEventListener("DOMContentLoaded", () => {
-
+    // 每次點擊重新觸發動畫
     setTimeout(() => {
-        const el = document.getElementById("introScreen");
-        el.style.opacity = "0";
-        setTimeout(() => el.remove(), 500);
-    }, 1000);
-
-    addView();
-    render();
-});
+        card.classList.remove("playing");
+    }, 700);
+}
 
 </script>
 
