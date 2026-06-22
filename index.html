@@ -27,27 +27,57 @@ button {
     padding:10px 20px;
     margin:10px;
     cursor:pointer;
+    background: #222;
+    color: #fff;
+    border: 1px solid #444;
+    border-radius: 4px;
+    font-size: 16px;
+}
+button:hover {
+    background: #333;
 }
 
 #output {
     margin-top:20px;
-    min-height:120px;
-    text-align:left;
+    min-height:30px;
+    text-align:center;
+    color: #aaa;
 }
 
 #stage {
     margin-top:25px;
     display:flex;
     justify-content:center;
+    align-items:center;
+    width: 100%;
 }
 
-canvas {
+/* 響應式容器：完美適應各種螢幕尺寸 */
+.guitar-container {
     background:#111;
     border-radius:12px;
-    width:100%;
-    max-width:420px;
-    aspect-ratio: 3 / 4;
+    width: 100%;
+    max-width: 800px; /* 橫向吉他，最大寬度放大 */
+    aspect-ratio: 16 / 7; /* 設定與 SVG 相同的比例 */
     border:1px solid #333;
+    padding: 10px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+svg {
+    width: 100%;
+    height: 100%;
+}
+
+/* 彈奏時的發光動畫效果 */
+.vibe {
+    transition: filter 0.1s ease;
+}
+.playing .vibe {
+    filter: drop-shadow(0 0 8px rgba(255,255,255,0.8));
 }
 
 .stats {
@@ -83,7 +113,7 @@ font-family:monospace;
 <h2>🎁 20260623 — gift</h2>
 
 <pre>
-#include <stdio.h>
+#include &lt;stdio.h&gt;
 
 int main() {
     printf("music starts...\n");
@@ -93,10 +123,69 @@ int main() {
 
 <button onclick="run()">실행 🎸</button>
 
-<div id="output"></div>
+<div id="output">ready.</div>
 
 <div id="stage">
-    <canvas id="art"></canvas>
+    <div class="guitar-container" id="guitarWrapper">
+        <svg viewBox="0 0 800 350" xmlns="http://www.w3.org/2000/svg">
+            <g class="vibe">
+                <path d="M 360,175 
+                         C 360,105 310,75 250,75 
+                         C 190,75 195,115 165,115 
+                         C 135,115 110,65 60,65 
+                         C 10,65 10,285 60,285 
+                         C 110,285 135,235 165,235 
+                         C 195,235 190,275 250,275 
+                         C 310,275 360,245 360,175 Z" 
+                      fill="none" stroke="#ffffff" stroke-width="2.5"/>
+                
+                <circle cx="275" cy="175" r="38" fill="#181818" stroke="#ffffff" stroke-width="1"/>
+                <circle cx="275" cy="175" r="34" fill="#0b0b0b" stroke="#ffffff" stroke-width="2"/>
+                <circle cx="275" cy="175" r="28" fill="#000000" stroke="#555555" stroke-width="1"/>
+
+                <rect x="110" y="140" width="15" height="70" rx="3" fill="#ffffff"/>
+                <circle cx="118" cy="148" r="1.5" fill="#111"/>
+                <circle cx="118" cy="159" r="1.5" fill="#111"/>
+                <circle cx="118" cy="170" r="1.5" fill="#111"/>
+                <circle cx="118" cy="181" r="1.5" fill="#111"/>
+                <circle cx="118" cy="192" r="1.5" fill="#111"/>
+                <circle cx="118" cy="203" r="1.5" fill="#111"/>
+            </g>
+
+            <rect x="360" y="161" width="300" height="28" fill="none" stroke="#ffffff" stroke-width="1.5"/>
+            
+            <path d="M 390,161 V 189 M 420,161 V 189 M 450,161 V 189 M 480,161 V 189 
+                     M 510,161 V 189 M 540,161 V 189 M 570,161 V 189 M 600,161 V 189 
+                     M 630,161 V 189 M 660,161 V 189" 
+                  stroke="#ffffff" stroke-width="1"/>
+
+            <circle cx="435" cy="175" r="2" fill="#ffffff"/>
+            <circle cx="495" cy="175" r="2" fill="#ffffff"/>
+            <circle cx="555" cy="175" r="2" fill="#ffffff"/>
+            <circle cx="615" cy="175" r="2" fill="#ffffff"/>
+            <circle cx="645" cy="171" r="1.5" fill="#ffffff"/>
+            <circle cx="645" cy="179" r="1.5" fill="#ffffff"/>
+
+            <path d="M 660,158 H 730 C 740,158 745,165 745,175 C 745,185 740,192 730,192 H 660 Z" 
+                  fill="none" stroke="#ffffff" stroke-width="2"/>
+
+            <circle cx="680" cy="148" r="3" fill="#ffffff"/><line x1="680" y1="148" x2="680" y2="158" stroke="#fff" stroke-width="2"/>
+            <circle cx="702" cy="148" r="3" fill="#ffffff"/><line x1="702" y1="148" x2="702" y2="158" stroke="#fff" stroke-width="2"/>
+            <circle cx="724" cy="148" r="3" fill="#ffffff"/><line x1="724" y1="148" x2="724" y2="158" stroke="#fff" stroke-width="2"/>
+            <circle cx="680" cy="202" r="3" fill="#ffffff"/><line x1="680" y1="202" x2="680" y2="192" stroke="#fff" stroke-width="2"/>
+            <circle cx="702" cy="202" r="3" fill="#ffffff"/><line x1="702" y1="202" x2="702" y2="192" stroke="#fff" stroke-width="2"/>
+            <circle cx="724" cy="202" r="3" fill="#ffffff"/><line x1="724" y1="202" x2="724" y2="192" stroke="#fff" stroke-width="2"/>
+
+            <g id="stringsGroup">
+                <line id="s1" x1="118" y1="148" x2="680" y2="163" stroke="#ffffff" stroke-width="1.2"/>
+                <line id="s2" x1="118" y1="159" x2="702" y2="167" stroke="#ffffff" stroke-width="1.0"/>
+                <line id="s3" x1="118" y1="170" x2="724" y2="172" stroke="#ffffff" stroke-width="0.9"/>
+                <line id="s4" x1="118" y1="181" x2="724" y2="178" stroke="#ffffff" stroke-width="0.8"/>
+                <line id="s5" x1="118" y1="192" x2="702" y2="183" stroke="#ffffff" stroke-width="0.7"/>
+                <line id="s6" x1="118" y1="203" x2="680" y2="187" stroke="#ffffff" stroke-width="0.6"/>
+            </g>
+        </svg>
+    </div>
 </div>
 
 <hr>
@@ -114,6 +203,7 @@ int main() {
 let audioCtx = null;
 let animFrame = 0;
 let playing = false;
+let animationId = null;
 
 function getStats(){
     return {
@@ -131,182 +221,15 @@ function render(){
 }
 
 /////////////////////////////////////////////////
-// GUITAR (improved shape)
-/////////////////////////////////////////////////
-
-function drawGuitar(ctx, w, h) {
-
-    ctx.strokeStyle = "#fff";
-    ctx.fillStyle = "#fff";
-    ctx.lineWidth = 1.5; // Slightly finer default lines
-
-    // Scale factors to fit within the canvas nicely
-    const scale = w / 420; // Original max-width reference
-
-    // 1. Neck & Headstock
-    const neckWidth = 24 * scale;
-    const neckX = w * 0.5 - neckWidth/2;
-    const neckY = h * 0.10;
-    const neckHeight = h * 0.50;
-
-    // Neck outline
-    ctx.beginPath();
-    ctx.moveTo(neckX, neckY);
-    ctx.lineTo(neckX, neckY + neckHeight);
-    ctx.moveTo(neckX + neckWidth, neckY);
-    ctx.lineTo(neckX + neckWidth, neckY + neckHeight);
-    ctx.stroke();
-
-    // Headstock
-    const hsWidth = 32 * scale;
-    const hsHeight = 45 * scale;
-    ctx.fillRect(w * 0.5 - hsWidth/2, neckY - hsHeight, hsWidth, hsHeight);
-
-    // Tuning Pegs (6 dots)
-    ctx.lineWidth = 1;
-    for (let i=0; i<6; i++) {
-        const side = i < 3 ? -1 : 1;
-        const row = i % 3;
-        const px = w * 0.5 + (side * (hsWidth/2 + 5 * scale));
-        const py = neckY - (hsHeight * 0.8) + (row * 12 * scale);
-        ctx.beginPath();
-        ctx.arc(px, py, 2.5 * scale, 0, Math.PI*2);
-        ctx.fillStyle = "#bbb";
-        ctx.fill();
-        ctx.fillStyle = "#fff"; // Reset
-    }
-
-    // 2. Fretboard
-    ctx.lineWidth = 1.5;
-    const startFret = neckY + (h * 0.05);
-    const endFret = neckY + neckHeight - (h * 0.03);
-    const numFrets = 15;
-    for (let i=0; i<numFrets; i++) {
-        const fretY = startFret + (endFret - startFret) * (i / (numFrets - 1));
-        ctx.beginPath();
-        ctx.moveTo(neckX, fretY);
-        ctx.lineTo(neckX + neckWidth, fretY);
-        ctx.stroke();
-    }
-
-    // Fret markers (optional dots)
-    const markerYPos = [3, 5, 7, 9, 12, 12.05].map(f => startFret + (endFret-startFret) * (f/(numFrets-1)));
-    ctx.fillStyle = "#ddd";
-    markerYPos.forEach(y => {
-        ctx.beginPath();
-        ctx.arc(w*0.5, y - 10*scale, 2*scale, 0, Math.PI*2);
-        ctx.fill();
-    });
-    ctx.fillStyle = "#fff"; // Reset
-
-    // 3. Body (Refined figure-8 shape)
-    const bodyCenterY = h * 0.76;
-    const upperY = bodyCenterY - (h*0.13);
-    const lowerY = bodyCenterY + (h*0.04);
-    
-    ctx.beginPath();
-    // Start top-left
-    ctx.moveTo(w*0.5, upperY); 
-
-    // Draw left side
-    ctx.bezierCurveTo(w*0.28, upperY, w*0.20, bodyCenterY*0.95, w*0.38, bodyCenterY); // Upper curve to waist
-    ctx.bezierCurveTo(w*0.24, bodyCenterY*1.05, w*0.20, lowerY*1.05, w*0.5, lowerY); // Waist to lower curve
-    
-    // Draw right side (symmetry)
-    ctx.bezierCurveTo(w*0.80, lowerY*1.05, w*0.76, bodyCenterY*1.05, w*0.62, bodyCenterY); // Lower curve to waist
-    ctx.bezierCurveTo(w*0.80, bodyCenterY*0.95, w*0.72, upperY, w*0.5, upperY); // Waist to upper curve
-    
-    ctx.lineWidth = 3; // Thicker for body
-    ctx.stroke();
-    ctx.lineWidth = 1.5; // Back to normal
-
-    // 4. Sound Hole & Rosette
-    const shRadius = 32 * scale;
-    const rosetteRadius = 38 * scale;
-    const shY = bodyCenterY - (h*0.03);
-
-    // Inner Hole (fill slightly darker or with alpha)
-    ctx.beginPath();
-    ctx.arc(w*0.5, shY, shRadius, 0, Math.PI*2);
-    ctx.fillStyle = "rgba(0,0,0,0.4)";
-    ctx.fill();
-    ctx.lineWidth = 1;
-    ctx.stroke();
-
-    // Outer Rosette (lines)
-    ctx.beginPath();
-    ctx.arc(w*0.5, shY, rosetteRadius, 0, Math.PI*2);
-    ctx.stroke();
-    ctx.lineWidth = 1.5; // Back to normal
-    ctx.fillStyle = "#fff"; // Reset
-
-    // 5. Bridge
-    const bridgeY = bodyCenterY + (h * 0.12);
-    const bridgeWidth = 60 * scale;
-    const bridgeHeight = 12 * scale;
-    ctx.fillRect(w * 0.5 - bridgeWidth/2, bridgeY, bridgeWidth, bridgeHeight);
-
-    // Bridge dots/pins
-    for(let i=0; i<6; i++) {
-        const px = w*0.5 - (bridgeWidth/2) + (i*10 + 5) * scale;
-        ctx.beginPath();
-        ctx.arc(px, bridgeY + bridgeHeight/2, 2*scale, 0, Math.PI*2);
-        ctx.fillStyle = "#ddd";
-        ctx.fill();
-    }
-    ctx.fillStyle = "#fff"; // Reset
-
-    // 6. Strings (6 proper strings)
-    ctx.lineWidth = 0.8;
-    for(let i=0; i<6; i++) {
-        const offset = playing ? Math.sin(animFrame*0.3 + i)*2 : 0;
-        
-        // String attachment point on neck/headstock (approximate)
-        const neckStrX = neckX + (neckWidth / 12) + (i * (neckWidth / 6.5));
-        
-        // String attachment point on bridge
-        const bridgeStrX = w*0.5 - (bridgeWidth/2) + (i*10 + 5) * scale;
-
-        ctx.beginPath();
-        // Adjust start point relative to neck width for realism
-        ctx.moveTo(neckStrX, neckY - (hsHeight * 0.3)); 
-        // Curve slightly if playing
-        ctx.lineTo(bridgeStrX + offset, bridgeY); 
-        ctx.stroke();
-    }
-
-    // ===== vibration glow (subtle and matching shape) =====
-    if(playing){
-        ctx.fillStyle = "rgba(255,255,255,0.03)";
-        ctx.beginPath();
-        // Draw the same figure-8 path, slightly enlarged
-        const vScale = 1.05;
-        ctx.scale(vScale,vScale);
-        ctx.translate((w/2)*(1-1/vScale), (h/2)*(1-1/vScale));
-
-        ctx.moveTo(w*0.5, upperY); 
-        ctx.bezierCurveTo(w*0.28, upperY, w*0.20, bodyCenterY*0.95, w*0.38, bodyCenterY);
-        ctx.bezierCurveTo(w*0.24, bodyCenterY*1.05, w*0.20, lowerY*1.05, w*0.5, lowerY);
-        ctx.bezierCurveTo(w*0.80, lowerY*1.05, w*0.76, bodyCenterY*1.05, w*0.62, bodyCenterY);
-        ctx.bezierCurveTo(w*0.80, bodyCenterY*0.95, w*0.72, upperY, w*0.5, upperY);
-        
-        ctx.fill();
-        ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset scale/translation
-    }
-}
-
-/////////////////////////////////////////////////
 // SOUND (Chord + rhythm)
 /////////////////////////////////////////////////
 
 function playChord(){
-
     if(!audioCtx){
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     }
 
     const now = audioCtx.currentTime;
-
     const chords = [
         [261.63, 329.63, 392.00], // C
         [196.00, 246.94, 392.00], // G
@@ -314,7 +237,6 @@ function playChord(){
     ];
 
     const chord = chords[Math.floor(Math.random() * chords.length)];
-
     const patterns = [
         [0, 0.10, 0.20, 0.30],
         [0, 0.07, 0.16, 0.26],
@@ -324,7 +246,6 @@ function playChord(){
     const pattern = patterns[Math.floor(Math.random() * patterns.length)];
 
     chord.forEach((freq, i) => {
-
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
 
@@ -346,48 +267,61 @@ function playChord(){
 }
 
 /////////////////////////////////////////////////
-// RUN
+// RUN (SVG Animation)
 /////////////////////////////////////////////////
 
 function run(){
-
     const s = getStats();
     s.r++;
     saveStats(s);
     render();
 
-    const canvas = document.getElementById("art");
-    const ctx = canvas.getContext("2d");
-
-    const w = Math.min(window.innerWidth * 0.8, 420);
-    const h = w * 1.3;
-
-    canvas.width = w;
-    canvas.height = h;
-
     playing = true;
     animFrame = 0;
 
     document.getElementById("output").innerText = "playing... 🎸";
+    document.getElementById("guitarWrapper").classList.add("playing");
 
     playChord();
 
+    // 原生 SVG 琴弦動畫（透過控制 Y2 座標模擬微幅震動）
+    const s1 = document.getElementById("s1");
+    const s2 = document.getElementById("s2");
+    const s3 = document.getElementById("s3");
+    const s4 = document.getElementById("s4");
+    const s5 = document.getElementById("s5");
+    const s6 = document.getElementById("s6");
+
     function animate(){
-
-        ctx.clearRect(0,0,w,h);
-
-        drawGuitar(ctx, w, h);
-
         animFrame++;
 
         if(animFrame < 60){
-            requestAnimationFrame(animate);
+            // 彈奏時讓琴弦產生正弦波上下晃動
+            const offset = Math.sin(animFrame * 0.8) * 2 * (1 - animFrame/60);
+            s1.setAttribute("y2", 163 + offset);
+            s2.setAttribute("y2", 167 - offset);
+            s3.setAttribute("y2", 172 + offset * 1.2);
+            s4.setAttribute("y2", 178 - offset * 1.2);
+            s5.setAttribute("y2", 183 + offset);
+            s6.setAttribute("y2", 187 - offset);
+
+            animationId = requestAnimationFrame(animate);
         } else {
             playing = false;
+            // 恢復原狀
+            s1.setAttribute("y2", 163);
+            s2.setAttribute("y2", 167);
+            s3.setAttribute("y2", 172);
+            s4.setAttribute("y2", 178);
+            s5.setAttribute("y2", 183);
+            s6.setAttribute("y2", 187);
+            
+            document.getElementById("guitarWrapper").classList.remove("playing");
             document.getElementById("output").innerText = "done.";
         }
     }
 
+    if(animationId) cancelAnimationFrame(animationId);
     animate();
 }
 
@@ -396,7 +330,6 @@ function run(){
 /////////////////////////////////////////////////
 
 window.addEventListener("DOMContentLoaded", () => {
-
     setTimeout(()=>{
         document.getElementById("introScreen").style.opacity = "0";
         setTimeout(()=>document.getElementById("introScreen").remove(),500);
