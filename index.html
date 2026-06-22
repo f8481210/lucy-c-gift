@@ -24,24 +24,38 @@ pre {
 }
 
 button {
-    padding:10px 20px;
+    padding:12px 24px;
     margin:10px;
     cursor:pointer;
     background: #222;
     color: #fff;
     border: 1px solid #444;
-    border-radius: 4px;
+    border-radius: 6px;
     font-size: 16px;
+    font-family: monospace;
+    transition: all 0.2s ease;
 }
 button:hover {
-    background: #333;
+    background: #ffffff;
+    color: #0b0b0b;
+    border-color: #fff;
+    box-shadow: 0 0 10px rgba(255,255,255,0.5);
+}
+button:disabled {
+    background: #111;
+    color: #555;
+    border-color: #222;
+    cursor: not-allowed;
+    box-shadow: none;
 }
 
 #output {
     margin-top:20px;
     min-height:30px;
     text-align:center;
-    color: #aaa;
+    color: #00ffcc;
+    font-weight: bold;
+    letter-spacing: 1px;
 }
 
 #stage {
@@ -52,19 +66,19 @@ button:hover {
     width: 100%;
 }
 
-/* 響應式容器：完美適應各種螢幕尺寸 */
 .guitar-container {
     background:#111;
     border-radius:12px;
     width: 100%;
-    max-width: 800px; /* 橫向吉他，最大寬度放大 */
-    aspect-ratio: 16 / 7; /* 設定與 SVG 相同的比例 */
+    max-width: 800px;
+    aspect-ratio: 16 / 7;
     border:1px solid #333;
     padding: 10px;
     box-sizing: border-box;
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: border-color 0.5s ease;
 }
 
 svg {
@@ -74,10 +88,14 @@ svg {
 
 /* 彈奏時的發光動畫效果 */
 .vibe {
-    transition: filter 0.1s ease;
+    transition: filter 0.3s ease;
 }
 .playing .vibe {
-    filter: drop-shadow(0 0 8px rgba(255,255,255,0.8));
+    filter: drop-shadow(0 0 6px rgba(0, 255, 204, 0.6));
+}
+.playing #bodyPath {
+    stroke: #00ffcc;
+    transition: stroke 0.5s ease;
 }
 
 .stats {
@@ -116,12 +134,13 @@ font-family:monospace;
 #include &lt;stdio.h&gt;
 
 int main() {
-    printf("music starts...\n");
+    // 讓程式演奏一首溫暖的木吉他曲吧！
+    play_melody("Canon Style - C Major");
     return 0;
 }
 </pre>
 
-<button onclick="run()">실행 🎸</button>
+<button id="runBtn" onclick="run()">실행 🎸 (播放音樂)</button>
 
 <div id="output">ready.</div>
 
@@ -129,7 +148,7 @@ int main() {
     <div class="guitar-container" id="guitarWrapper">
         <svg viewBox="0 0 800 350" xmlns="http://www.w3.org/2000/svg">
             <g class="vibe">
-                <path d="M 360,175 
+                <path id="bodyPath" d="M 360,175 
                          C 360,105 310,75 250,75 
                          C 190,75 195,115 165,115 
                          C 135,115 110,65 60,65 
@@ -163,8 +182,6 @@ int main() {
             <circle cx="495" cy="175" r="2" fill="#ffffff"/>
             <circle cx="555" cy="175" r="2" fill="#ffffff"/>
             <circle cx="615" cy="175" r="2" fill="#ffffff"/>
-            <circle cx="645" cy="171" r="1.5" fill="#ffffff"/>
-            <circle cx="645" cy="179" r="1.5" fill="#ffffff"/>
 
             <path d="M 660,158 H 730 C 740,158 745,165 745,175 C 745,185 740,192 730,192 H 660 Z" 
                   fill="none" stroke="#ffffff" stroke-width="2"/>
@@ -201,128 +218,186 @@ int main() {
 /////////////////////////////////////////////////
 
 let audioCtx = null;
-let animFrame = 0;
 let playing = false;
-let animationId = null;
+let currentBpm = 85; 
+let beatDuration = 60 / currentBpm; // 一拍的時間(秒)
+
+// 定義高精度音符頻率
+const NOTES = {
+    C3: 130.81, D3: 146.83, E3: 164.81, F3: 174.61, G3: 196.00, A3: 220.00, B3: 246.94,
+    C4: 261.63, D4: 293.66, E4: 329.63, F4: 349.23, G4: 392.00, A4: 440.00, B4: 493.88,
+    C5: 523.25, D5: 587.33, E5: 659.25, F5: 698.46, G5: 783.99, A5: 880.00
+};
+
+// 卡農風格的溫暖和弦與指彈編曲進行
+// 每個小節含有 [根音/低音, 弦3音, 弦2音, 弦1高音] 分時段彈奏
+const SONG_DATA = [
+    // 1. C Major
+    { bass: NOTES.C3, treble: [NOTES.E4, NOTES.G4, NOTES.C5], label: "C Major" },
+    // 2. G Major
+    { bass: NOTES.G3, treble: [NOTES.D4, NOTES.G4, NOTES.B4], label: "G Major" },
+    // 3. A Minor
+    { bass: NOTES.A3, treble: [NOTES.E4, NOTES.A4, NOTES.C5], label: "A Minor" },
+    // 4. E Minor
+    { bass: NOTES.E3, treble: [NOTES.G4, NOTES.B4, NOTES.E5], label: "E Minor" },
+    // 5. F Major
+    { bass: NOTES.F3, treble: [NOTES.A4, NOTES.C5, NOTES.F5], label: "F Major" },
+    // 6. C Major
+    { bass: NOTES.C3, treble: [NOTES.E4, NOTES.G4, NOTES.C5], label: "C Major" },
+    // 7. F Major / G
+    { bass: NOTES.F3, treble: [NOTES.A4, NOTES.C5, NOTES.F5], label: "F Major" },
+    // 8. G Major (結束式)
+    { bass: NOTES.G3, treble: [NOTES.B4, NOTES.D5, NOTES.G5], label: "G Major" }
+];
 
 function getStats(){
-    return {
-        r: Number(localStorage.getItem("r") || 0),
-    };
+    return { r: Number(localStorage.getItem("r") || 0) };
 }
-
 function saveStats(s){
     localStorage.setItem("r", s.r);
 }
-
 function render(){
     const s = getStats();
     document.getElementById("r").innerText = s.r;
 }
 
 /////////////////////////////////////////////////
-// SOUND (Chord + rhythm)
+// 木吉他物理建模音色合成器
 /////////////////////////////////////////////////
 
-function playChord(){
-    if(!audioCtx){
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    }
+function playGuitarTone(freq, startTime, duration, volume = 0.3) {
+    if (!audioCtx) return;
 
-    const now = audioCtx.currentTime;
-    const chords = [
-        [261.63, 329.63, 392.00], // C
-        [196.00, 246.94, 392.00], // G
-        [220.00, 261.63, 329.63], // Am
-    ];
+    const osc = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+    
+    // 木吉他常用低通濾波器來濾除尖銳高音，保留木頭箱體的溫暖共鳴
+    const filter = audioCtx.createBiquadFilter();
+    filter.type = "lowpass";
+    // 讓剛撥弦時明亮，隨後變暗淡
+    filter.frequency.setValueAtTime(2000, startTime);
+    filter.frequency.exponentialRampToValueAtTime(300, startTime + duration);
 
-    const chord = chords[Math.floor(Math.random() * chords.length)];
-    const patterns = [
-        [0, 0.10, 0.20, 0.30],
-        [0, 0.07, 0.16, 0.26],
-        [0, 0.05, 0.18, 0.32],
-    ];
+    // 吉他撥弦使用三角波模擬柔和的尼龍或鋼弦質感
+    osc.type = "triangle";
+    osc.frequency.setValueAtTime(freq, startTime);
 
-    const pattern = patterns[Math.floor(Math.random() * patterns.length)];
+    // 模擬吉他 ADSR 曲線 (瞬態爆發力與隨後的自然衰減)
+    gainNode.gain.setValueAtTime(0.0001, startTime);
+    gainNode.gain.linearRampToValueAtTime(volume, startTime + 0.01); // 撥弦的一瞬間
+    gainNode.gain.exponentialRampToValueAtTime(volume * 0.5, startTime + 0.1); 
+    gainNode.gain.exponentialRampToValueAtTime(0.0001, startTime + duration); // 餘音淡出
 
-    chord.forEach((freq, i) => {
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
+    osc.connect(filter);
+    filter.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
 
-        osc.type = "triangle";
-        osc.frequency.value = freq;
-
-        const t = now + pattern[i];
-
-        gain.gain.setValueAtTime(0.0001, t);
-        gain.gain.exponentialRampToValueAtTime(0.25, t + 0.02);
-        gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.6);
-
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-
-        osc.start(t);
-        osc.stop(t + 0.7);
-    });
+    osc.start(startTime);
+    osc.stop(startTime + duration + 0.1);
 }
 
 /////////////////////////////////////////////////
-// RUN (SVG Animation)
+// 樂曲調度排程與動畫控制
 /////////////////////////////////////////////////
 
 function run(){
+    if(playing) return; // 防止重複點擊
+    
     const s = getStats();
     s.r++;
     saveStats(s);
     render();
 
-    playing = true;
-    animFrame = 0;
-
-    document.getElementById("output").innerText = "playing... 🎸";
-    document.getElementById("guitarWrapper").classList.add("playing");
-
-    playChord();
-
-    // 原生 SVG 琴弦動畫（透過控制 Y2 座標模擬微幅震動）
-    const s1 = document.getElementById("s1");
-    const s2 = document.getElementById("s2");
-    const s3 = document.getElementById("s3");
-    const s4 = document.getElementById("s4");
-    const s5 = document.getElementById("s5");
-    const s6 = document.getElementById("s6");
-
-    function animate(){
-        animFrame++;
-
-        if(animFrame < 60){
-            // 彈奏時讓琴弦產生正弦波上下晃動
-            const offset = Math.sin(animFrame * 0.8) * 2 * (1 - animFrame/60);
-            s1.setAttribute("y2", 163 + offset);
-            s2.setAttribute("y2", 167 - offset);
-            s3.setAttribute("y2", 172 + offset * 1.2);
-            s4.setAttribute("y2", 178 - offset * 1.2);
-            s5.setAttribute("y2", 183 + offset);
-            s6.setAttribute("y2", 187 - offset);
-
-            animationId = requestAnimationFrame(animate);
-        } else {
-            playing = false;
-            // 恢復原狀
-            s1.setAttribute("y2", 163);
-            s2.setAttribute("y2", 167);
-            s3.setAttribute("y2", 172);
-            s4.setAttribute("y2", 178);
-            s5.setAttribute("y2", 183);
-            s6.setAttribute("y2", 187);
-            
-            document.getElementById("guitarWrapper").classList.remove("playing");
-            document.getElementById("output").innerText = "done.";
-        }
+    if(!audioCtx){
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     }
 
-    if(animationId) cancelAnimationFrame(animationId);
-    animate();
+    playing = true;
+    document.getElementById("runBtn").disabled = true;
+    document.getElementById("guitarWrapper").classList.add("playing");
+
+    const now = audioCtx.currentTime;
+    let timeCursor = now + 0.2; // 給點小緩衝
+
+    // 建立整首歌的排程 (2遍循環，打造一段精緻的小樂曲)
+    const totalLoops = 2;
+    let currentChordIndex = 0;
+
+    for (let loop = 0; loop < totalLoops; loop++) {
+        SONG_DATA.forEach((chord) => {
+            
+            // 每一小節 4 拍的 T1232123 指彈吉他分解和弦 (Arpeggio)
+            const pattern = [
+                { time: 0,           freq: chord.bass,      vol: 0.35, len: beatDuration * 1.5 }, // 根音 (重拍)
+                { time: beatDuration * 0.5,  freq: chord.treble[0], vol: 0.20, len: beatDuration },       // 3弦
+                { time: beatDuration * 1.0,  freq: chord.treble[1], vol: 0.22, len: beatDuration },       // 2弦
+                { time: beatDuration * 1.5,  freq: chord.treble[2], vol: 0.25, len: beatDuration * 2 },   // 1弦 (主旋律高音)
+                { time: beatDuration * 2.0,  freq: chord.treble[1], vol: 0.20, len: beatDuration },       // 2弦
+                { time: beatDuration * 2.5,  freq: chord.treble[0], vol: 0.18, len: beatDuration },       // 3弦
+                { time: beatDuration * 3.0,  freq: chord.treble[1], vol: 0.22, len: beatDuration }        // 2弦
+            ];
+
+            pattern.forEach(note => {
+                playGuitarTone(note.freq, timeCursor + note.time, note.len, note.vol);
+            });
+
+            // 設定文字和弦變更的排程時間點
+            const displayTime = (timeCursor - now) * 1000;
+            const labelText = chord.label;
+            setTimeout(() => {
+                if(playing) document.getElementById("output").innerText = `Playing: ${labelText} 🎶`;
+            }, displayTime);
+
+            timeCursor += beatDuration * 4; // 邁入下一小節
+        });
+    }
+
+    // 結尾最完美的最終刷弦 (C Major Chord Burst)
+    const finalTime = timeCursor;
+    playGuitarTone(NOTES.C3, finalTime, beatDuration * 4, 0.35);
+    playGuitarTone(NOTES.E4, finalTime + 0.03, beatDuration * 4, 0.25);
+    playGuitarTone(NOTES.G4, finalTime + 0.06, beatDuration * 4, 0.25);
+    playGuitarTone(NOTES.C5, finalTime + 0.09, beatDuration * 4, 0.30);
+
+    setTimeout(() => {
+        document.getElementById("output").innerText = `Ending: C Major Chord 🌊`;
+    }, (finalTime - now) * 1000);
+
+    // 琴弦物理動態震動動畫
+    const strings = [
+        document.getElementById("s1"), document.getElementById("s2"),
+        document.getElementById("s3"), document.getElementById("s4"),
+        document.getElementById("s5"), document.getElementById("s6")
+    ];
+    const defaultY2 = [163, 167, 172, 178, 183, 187];
+
+    let animFrame = 0;
+    const totalDurationMs = (finalTime + beatDuration * 4 - now) * 1000;
+
+    function drawFrame() {
+        animFrame++;
+        // 讓琴弦隨著音樂時間波形產生不規則的正弦微震幅
+        const offset = Math.sin(animFrame * 0.6) * 1.8;
+        
+        strings.forEach((str, idx) => {
+            const side = idx % 2 === 0 ? 1 : -1;
+            str.setAttribute("y2", defaultY2[idx] + (offset * side));
+        });
+
+        if (playing) {
+            requestAnimationFrame(drawFrame);
+        }
+    }
+    requestAnimationFrame(drawFrame);
+
+    // 音樂結束後的重置排程
+    setTimeout(() => {
+        playing = false;
+        strings.forEach((str, idx) => str.setAttribute("y2", defaultY2[idx])); // 歸位
+        document.getElementById("guitarWrapper").classList.remove("playing");
+        document.getElementById("runBtn").disabled = false;
+        document.getElementById("output").innerText = "Song finished. Done. ✨";
+    }, totalDurationMs);
 }
 
 /////////////////////////////////////////////////
