@@ -39,13 +39,16 @@ button {
     margin-top:20px;
     color:#ccc;
 }
-    #introScreen {
+
+/* intro fade */
+#introScreen {
     transition: opacity 0.5s ease;
 }
 </style>
 </head>
 
 <body>
+
 <div id="introScreen" style="
 position:fixed;
 top:0;left:0;
@@ -59,11 +62,10 @@ flex-direction:column;
 z-index:9999;
 font-family:monospace;
 ">
-
 <div>INITIALIZING...</div>
 <div style="margin-top:10px;color:#aaa;">loading gift system</div>
-
 </div>
+
 <h2>🎁 20260623 — 상엽에게</h2>
 <p class="small">C 언어 선물 프로그램</p>
 
@@ -74,7 +76,6 @@ void heart();
 void message();
 
 int main() {
-
     printf("Initializing...\n");
 
     for(int i=0;i<3;i++){
@@ -121,15 +122,15 @@ void message() {
 <div id="secret" style="margin-top:30px;color:#111;">.</div>
 
 <script>
+// intro fade
 setTimeout(() => {
-    document.getElementById("introScreen").style.opacity = "0";
-    setTimeout(() => {
-        document.getElementById("introScreen").remove();
-    }, 500);
+    const el = document.getElementById("introScreen");
+    el.style.opacity = "0";
+    setTimeout(() => el.remove(), 500);
 }, 1200);
 
 /////////////////////////////////////////////////
-// STATS (localStorage version - SAFE)
+// STATS
 /////////////////////////////////////////////////
 
 function getStats(){
@@ -147,22 +148,18 @@ function saveStats(s){
 }
 
 function render(){
-    let s = getStats();
+    const s = getStats();
     document.getElementById("v").innerText = s.v;
     document.getElementById("r").innerText = s.r;
     document.getElementById("c").innerText = s.c;
 }
 
 function addView(){
-    let s = getStats();
+    const s = getStats();
     s.v++;
     saveStats(s);
     render();
 }
-
-/////////////////////////////////////////////////
-// INIT
-/////////////////////////////////////////////////
 
 addView();
 
@@ -172,13 +169,13 @@ addView();
 
 function run(){
 
-    let s = getStats();
+    const s = getStats();
     s.r++;
     saveStats(s);
     render();
 
     const out = document.getElementById("output");
-    out.innerText = "";
+    out.innerHTML = "";
 
     const lines = [
         "gcc 컴파일 중...",
@@ -199,14 +196,20 @@ function run(){
 
     let i = 0;
 
-    let timer = setInterval(() => {
+    const timer = setInterval(() => {
+
+        if (!lines[i]) {
+            clearInterval(timer);
+            return;
+        }
+
         out.innerHTML += lines[i] + "<br>";
         i++;
 
         if(i >= lines.length){
             clearInterval(timer);
 
-            // ❤️ 愛心（在結束後才出現）
+            // heart
             out.innerHTML += `
             <div style="margin-top:20px; display:flex; justify-content:center;">
                 <svg width="120" height="110" viewBox="0 0 24 24" fill="red">
@@ -214,46 +217,34 @@ function run(){
                 </svg>
             </div>
             `;
-        }}
 
-            // NAME
-            
+            // ASCII NAME
+            const sBlock = [
+                "★★★★★★★        ★★★★★★★",
+                "★★★★★★★★      ★★★★★★★★",
+                "★★★    ★★★    ★★★    ★★★",
+                "★★★           ★★★",
+                "★★★★★★★★      ★★★★★★★★",
+                "★★★★★★★        ★★★★★★★"
+            ];
 
-const star = "★";
+            const nBlock = [
+                "★★★★★★★     ★★★★★★★",
+                "★★★★★★★★    ★★★★★★★★",
+                "★★★   ★★★   ★★★   ★★★",
+                "★★★    ★★★  ★★★   ★★★",
+                "★★★     ★★★ ★★★   ★★★",
+                "★★★      ★★★★★    ★★★"
+            ];
 
-const s = [
-"★★★★★★★        ★★★★★★★",
-"★★★★★★★★      ★★★★★★★★",
-"★★★    ★★★    ★★★    ★★★",
-"★★★           ★★★",
-"★★★★★★★★      ★★★★★★★★",
-"★★★★★★★        ★★★★★★★"
-];
+            out.innerHTML += "<br>";
 
-const a = [
-"      ★★★★★★★★      ",
-"    ★★★★★★★★★★★★    ",
-"  ★★★        ★★★  ",
-"  ★★★★★★★★★★★★  ",
-"  ★★★        ★★★  ",
-"  ★★★        ★★★  "
-];
+            sBlock.forEach(l => out.innerHTML += l + "<br>");
+            out.innerHTML += "<br>";
+            nBlock.forEach(l => out.innerHTML += l + "<br>");
+        }
 
-const n = [
-"★★★★★★★     ★★★★★★★",
-"★★★★★★★★    ★★★★★★★★",
-"★★★   ★★★   ★★★   ★★★",
-"★★★    ★★★  ★★★   ★★★",
-"★★★     ★★★ ★★★   ★★★",
-"★★★      ★★★★★    ★★★"
-];
-
-// 상
-s.forEach(l => out.innerText += l + "<br>");
-out.innerText += "<br>";
-
-// 엽
-n.forEach(l => out.innerText += l + "<br>");
+    }, 120);
 }
 
 /////////////////////////////////////////////////
@@ -262,12 +253,14 @@ n.forEach(l => out.innerText += l + "<br>");
 
 function copy(){
 
-    let s = getStats();
+    const s = getStats();
     s.c++;
     saveStats(s);
     render();
 
-    navigator.clipboard.writeText(document.querySelector("pre").innerText);
+    navigator.clipboard.writeText(
+        document.querySelector("pre").innerText
+    );
 
     alert("C 코드가 복사되었습니다.\n조심해서 실행해 주세요 ❤️");
 }
@@ -278,27 +271,30 @@ function copy(){
 
 let keys = "";
 
-document.addEventListener("keydown", function(e){
+document.addEventListener("keydown", (e) => {
 
-    keys += e.key.toLowerCase();
+    if (e.key.length === 1) {
+        keys += e.key.toLowerCase();
+    }
 
     if(keys.includes("lucy")){
         document.getElementById("secret").style.color = "#fff";
         document.getElementById("secret").innerText =
-        "🎵 Hidden Message Unlocked:\n" +
-        "Thank you for your music.\n" +
-        "From Taiwan Fan ❤️";
+            "🎵 Hidden Message Unlocked:\n" +
+            "Thank you for your music.\n" +
+            "From Taiwan Fan ❤️";
 
         keys = "";
     }
 
     if(keys.length > 20) keys = "";
 });
-
 </script>
+
 <p style="margin-top:40px;color:#888;">
 This is not just code.<br>
 It is a message compiled with music.
 </p>
+
 </body>
 </html>
