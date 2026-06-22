@@ -326,7 +326,7 @@ let beatDuration = 60 / currentBpm;
 let selectedFeedbacks = {}; 
 
 // 🌟 移到最頂層：全域的 Google Apps Script 計數器部署網址
-const GAS_COUNTER_URL = "https://script.google.com/macros/s/AKfycbwTb-29jZnzFwvgLg20AGgwX48SmpcjSmGdetNhyT0c96OJQjziBE-Iw8_vcw-ZcKYA/exec";
+const GAS_COUNTER_URL = "https://script.google.com/macros/s/AKfycbwTb-29jZnzFwvgLg20AGgwX48SmpcjSmGdetNhyT0c96OJQjziBE-Iw8_vcw-ZcKYA/exec?type=visit";
 
 const NOTES = {
     C3: 130.81, D3: 146.83, E3: 164.81, F3: 174.61, G3: 196.00, A3: 220.00, B3: 246.94,
@@ -495,7 +495,7 @@ function run(){
     // 按下執行的瞬間，執行按鈕變黑（反灰鎖死），同時解鎖下方回饋區
     document.getElementById("runBtn").disabled = true;
     document.getElementById("fbStatus").style.color = "#00ffcc";
-    document.getElementById("fbStatus").innerText = "🎵 음악을 들으면서 피드백을 선택해 주세요! (可以邊聽邊選唷！)";
+    document.getElementById("fbStatus").innerText = "🎵 음악을 들으면서 피드백을 선택해 주세요!";
     document.getElementById("commentInput").value = ""; 
     
     const buttons = document.querySelectorAll('.fb-btn');
