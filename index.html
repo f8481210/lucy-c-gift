@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>20260623 — gift</title>
+<title>20260623 — 상엽에게</title>
 
 <style>
 body {
@@ -128,19 +128,45 @@ font-family:monospace;
 <div style="margin-top:10px;color:#aaa;">loading gift system</div>
 </div>
 
-<h2>🎁 20260623 — gift</h2>
+<h2>🎁 20260623 — 상엽에게</h2> 
+<p class="small">C 언어 선물 프로그램</p>
 
 <pre>
-#include &lt;stdio.h&gt;
+#include <stdio.h>
+
+void heart();
+void message();
 
 int main() {
-    // 讓程式演奏一首溫暖的木吉他曲吧！
-    play_melody("Canon Style - C Major");
+
+    heart();
+    message();
+
     return 0;
+}
+
+void heart() {
+    printf("  ***     *** \n");
+    printf("******* ******* \n");
+    printf(" *************  \n");
+    printf("  ***********   \n");
+    printf("    *******     \n");
+    printf("      ***       \n");
+}
+
+void message() {
+    printf("처음으로 코딩해서 이런 웹사이트를 만들었어요!😆 \n");
+    printf("심지어 기타도 전부 코드로 직접 만든 거예요 🎸✨ \n");
+    printf("전체 웹페이지는 약 3시간 정도 걸려서 완성했어요 \n");
+    printf("상엽 오빠한테 보여주고 싶어서 열심히 만들었어요ㅎㅎ \n");
+    printf("저는 진짜 너무너무 마음에 들어요 ❤️ \n");
+    printf("오빠도 혹시 좋아해 주면 좋겠어요 \n");
+    printf("항상 오빠가 주는 따뜻함만 받는 게 아니라 \n");
+    printf("저도 아주 작은 행복이라도 줄 수 있으면 좋겠어요🥺 \n");
 }
 </pre>
 
-<button id="runBtn" onclick="run()">실행 🎸 (播放音樂)</button>
+<button id="runBtn" onclick="run()">실행🎸(짧은 음악 나와요)</button>
 
 <div id="output">ready.</div>
 
