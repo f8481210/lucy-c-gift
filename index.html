@@ -139,50 +139,63 @@ function drawGuitar(ctx, w, h) {
     ctx.strokeStyle = "#fff";
     ctx.lineWidth = 3;
 
-    // neck
-    ctx.beginPath();
-    ctx.moveTo(w * 0.52, h * 0.05);
-    ctx.lineTo(w * 0.55, h * 0.55);
-    ctx.stroke();
-
-    // head
+    // ===== neck =====
     ctx.fillStyle = "#fff";
-    ctx.fillRect(w * 0.495, h * 0.02, w * 0.07, h * 0.05);
+    ctx.fillRect(w * 0.49, h * 0.02, w * 0.06, h * 0.55);
 
-    // body (real guitar silhouette)
-    ctx.beginPath();
-    ctx.moveTo(w * 0.50, h * 0.55);
-
-    ctx.bezierCurveTo(w * 0.28, h * 0.60, w * 0.28, h * 0.72, w * 0.48, h * 0.72);
-    ctx.bezierCurveTo(w * 0.28, h * 0.82, w * 0.38, h * 0.92, w * 0.50, h * 0.86);
-    ctx.bezierCurveTo(w * 0.62, h * 0.92, w * 0.72, h * 0.82, w * 0.52, h * 0.72);
-    ctx.bezierCurveTo(w * 0.72, h * 0.72, w * 0.72, h * 0.60, w * 0.50, h * 0.55);
-
-    ctx.closePath();
-    ctx.stroke();
-
-    // sound hole
-    ctx.beginPath();
-    ctx.arc(w * 0.5, h * 0.73, w * 0.05, 0, Math.PI * 2);
-    ctx.stroke();
-
-    // strings (animated)
-    const baseY = h * 0.58;
-
-    for(let i=0;i<5;i++){
-
-        const offset = playing ? Math.sin(animFrame * 0.3 + i) * 4 : 0;
-
+    // frets (視覺分段)
+    for(let i=0;i<6;i++){
         ctx.beginPath();
-        ctx.moveTo(w * 0.48, baseY + i * 8);
-        ctx.lineTo(w * 0.58, h * 0.12 + i * 8 + offset);
+        ctx.moveTo(w * 0.49, h * (0.10 + i*0.07));
+        ctx.lineTo(w * 0.55, h * (0.10 + i*0.07));
         ctx.stroke();
     }
 
+    // ===== head =====
+    ctx.fillRect(w * 0.48, h * 0.01, w * 0.08, h * 0.04);
+
+    // ===== body (標準吉他雙梨形) =====
+    ctx.beginPath();
+
+    // 上半球
+    ctx.ellipse(w*0.5, h*0.62, w*0.22, h*0.12, 0, 0, Math.PI*2);
+    ctx.stroke();
+
+    // 下半球
+    ctx.beginPath();
+    ctx.ellipse(w*0.5, h*0.78, w*0.28, h*0.18, 0, 0, Math.PI*2);
+    ctx.stroke();
+
+    // 腰身連接感
+    ctx.beginPath();
+    ctx.moveTo(w*0.28, h*0.62);
+    ctx.lineTo(w*0.22, h*0.78);
+    ctx.moveTo(w*0.72, h*0.62);
+    ctx.lineTo(w*0.78, h*0.78);
+    ctx.stroke();
+
+    // ===== sound hole =====
+    ctx.beginPath();
+    ctx.arc(w*0.5, h*0.74, w*0.06, 0, Math.PI*2);
+    ctx.stroke();
+
+    // ===== strings =====
+    const baseY = h*0.58;
+
+    for(let i=0;i<5;i++){
+        const offset = playing ? Math.sin(animFrame*0.3 + i)*3 : 0;
+
+        ctx.beginPath();
+        ctx.moveTo(w*0.49, baseY + i*8);
+        ctx.lineTo(w*0.51, h*0.12 + i*8 + offset);
+        ctx.stroke();
+    }
+
+    // ===== vibration glow =====
     if(playing){
         ctx.fillStyle = "rgba(255,255,255,0.05)";
         ctx.beginPath();
-        ctx.arc(w*0.5, h*0.73, w*0.25, 0, Math.PI*2);
+        ctx.arc(w*0.5, h*0.75, w*0.3, 0, Math.PI*2);
         ctx.fill();
     }
 }
