@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>C Fan Gift</title>
+<title>20260623 — 상엽에게</title>
 <style>
 body {
     background:#0b0b0b;
@@ -139,6 +139,25 @@ function copy() {
 }
 
 </script>
+<div id="secret" style="margin-top:30px;color:#111;">.</div>
 
+<script>
+let keys = "";
+
+document.addEventListener("keydown", function(e){
+    keys += e.key;
+
+    // 觸發彩蛋：輸入 "lucy"
+    if(keys.includes("lucy")){
+        document.getElementById("secret").style.color = "#fff";
+        document.getElementById("secret").innerText =
+        "🎵 Hidden Message Unlocked:\nThank you for your music.\nFrom Taiwan Fan ❤️";
+
+        keys = "";
+    }
+
+    if(keys.length > 20) keys = "";
+});
+</script>
 </body>
 </html>
