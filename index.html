@@ -5,181 +5,191 @@
 <title>20260623 — gift</title>
 
 <style>
-body{
+body {
     margin:0;
     background:#0b0b0b;
-    color:white;
-    font-family:monospace;
-    display:flex;
-    justify-content:center;
+    color:#fff;
+    font-family: monospace;
+    text-align:center;
     padding:30px;
 }
 
-.wrap{
-    width:min(90vw, 420px);
-    text-align:center;
+pre {
+    background:#1c1c1c;
+    padding:15px;
+    text-align:left;
+    overflow-x:auto;
+    border-radius:8px;
+    white-space:pre;
 }
 
-h2{
-    margin-bottom:10px;
-}
-
-.card{
-    margin-top:20px;
-    padding:20px;
-    background:#111;
-    border-radius:18px;
+button {
+    padding:10px 20px;
+    margin:10px;
     cursor:pointer;
-    user-select:none;
-    transition:0.3s;
 }
 
-.card:active{
-    transform:scale(0.98);
+#output {
+    margin-top:20px;
+    min-height:120px;
+    text-align:left;
 }
 
-/* 🎸 guitar container */
-.guitar{
-    position:relative;
-    height:220px;
+#stage {
+    margin-top:25px;
+    display:flex;
+    justify-content:center;
 }
 
-/* body */
-.body{
-    position:absolute;
-    left:50%;
-    bottom:10px;
-    transform:translateX(-50%);
-    width:120px;
-    height:120px;
-    border-radius:50%;
-    border:2px solid white;
-    transition:0.2s;
+canvas {
+    background:#111;
+    border-radius:12px;
+    width:100%;
+    max-width:420px;
+    aspect-ratio: 3 / 4;
+    border:1px solid #333;
 }
 
-/* neck */
-.neck{
-    position:absolute;
-    left:50%;
-    top:0;
-    transform:translateX(-50%);
-    width:6px;
-    height:110px;
-    background:white;
+.stats {
+    margin-top:20px;
+    color:#ccc;
 }
 
-/* strings */
-.strings{
-    position:absolute;
-    left:50%;
-    top:10px;
-    transform:translateX(-50%);
-    width:2px;
-    height:180px;
-    background:repeating-linear-gradient(
-        to bottom,
-        white,
-        white 3px,
-        transparent 3px,
-        transparent 10px
-    );
-}
-
-/* 🎸 animation */
-.card.playing .body{
-    animation:shake 0.15s infinite;
-}
-
-.card.playing .strings{
-    animation:pluck 0.2s infinite;
-}
-
-@keyframes shake{
-    0%{ transform:translateX(-50%) rotate(-2deg);}
-    50%{ transform:translateX(-50%) rotate(2deg);}
-    100%{ transform:translateX(-50%) rotate(-2deg);}
-}
-
-@keyframes pluck{
-    0%{ transform:translateX(-50%) translateY(0);}
-    50%{ transform:translateX(-50%) translateY(-2px);}
-    100%{ transform:translateX(-50%) translateY(0);}
-}
-
-p{
-    margin-top:15px;
-    color:#aaa;
-    font-size:14px;
-}
-
-.small{
-    color:#777;
-    font-size:12px;
-}
-.card{
-    position:relative;
-    overflow:hidden;
-}
-
-/* 💡 spotlight flash */
-.card.flash::before{
-    content:"";
-    position:absolute;
-    top:-50%;
-    left:-50%;
-    width:200%;
-    height:200%;
-    background:radial-gradient(circle, rgba(255,255,255,0.25), transparent 60%);
-    animation:flash 0.2s ease;
-}
-
-@keyframes flash{
-    from{opacity:1;}
-    to{opacity:0;}
+#introScreen {
+    transition: opacity 0.5s ease;
 }
 </style>
 </head>
 
 <body>
 
-<div class="wrap">
+<div id="introScreen" style="
+position:fixed;
+top:0;left:0;
+width:100%;height:100%;
+background:#0b0b0b;
+color:white;
+display:flex;
+align-items:center;
+justify-content:center;
+flex-direction:column;
+z-index:9999;
+font-family:monospace;
+">
+<div>INITIALIZING...</div>
+<div style="margin-top:10px;color:#aaa;">loading gift system</div>
+</div>
 
-    <h2>🎁 20260623</h2>
-    <div class="small">a small interactive gift</div>
+<h2>🎁 20260623 — gift</h2>
 
-    <div class="card" onclick="play()">
+<pre>
+#include <stdio.h>
 
-        <div class="guitar">
-            <div class="neck"></div>
-            <div class="body"></div>
-            <div class="strings"></div>
-        </div>
+int main() {
+    printf("music starts...\n");
+    return 0;
+}
+</pre>
 
-        <p>tap to play 🎸</p>
+<button onclick="run()">실행 🎸</button>
 
-    </div>
+<div id="output"></div>
 
+<div id="stage">
+    <canvas id="art"></canvas>
+</div>
+
+<hr>
+
+<div class="stats">
+<p>Runs: <span id="r">0</span></p>
 </div>
 
 <script>
 
+/////////////////////////////////////////////////
+// STATE
+/////////////////////////////////////////////////
+
 let audioCtx = null;
+let animFrame = 0;
+let playing = false;
 
-function play(){
-
-    const card = document.querySelector(".card");
-
-    // 💡 stage light flash
-    card.classList.add("flash");
-    setTimeout(()=> card.classList.remove("flash"), 200);
-
-    // 🎸 animation
-    card.classList.add("playing");
-    setTimeout(() => card.classList.remove("playing"), 900);
-
-    // 🎵 chord sound
-    playChord();
+function getStats(){
+    return {
+        r: Number(localStorage.getItem("r") || 0),
+    };
 }
+
+function saveStats(s){
+    localStorage.setItem("r", s.r);
+}
+
+function render(){
+    const s = getStats();
+    document.getElementById("r").innerText = s.r;
+}
+
+/////////////////////////////////////////////////
+// GUITAR (better shape)
+/////////////////////////////////////////////////
+
+function drawGuitar(ctx, w, h) {
+
+    ctx.strokeStyle = "#fff";
+    ctx.lineWidth = 3;
+
+    // neck
+    ctx.beginPath();
+    ctx.moveTo(w * 0.52, h * 0.05);
+    ctx.lineTo(w * 0.55, h * 0.55);
+    ctx.stroke();
+
+    // head
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(w * 0.495, h * 0.02, w * 0.07, h * 0.05);
+
+    // body (real guitar silhouette)
+    ctx.beginPath();
+    ctx.moveTo(w * 0.50, h * 0.55);
+
+    ctx.bezierCurveTo(w * 0.28, h * 0.60, w * 0.28, h * 0.72, w * 0.48, h * 0.72);
+    ctx.bezierCurveTo(w * 0.28, h * 0.82, w * 0.38, h * 0.92, w * 0.50, h * 0.86);
+    ctx.bezierCurveTo(w * 0.62, h * 0.92, w * 0.72, h * 0.82, w * 0.52, h * 0.72);
+    ctx.bezierCurveTo(w * 0.72, h * 0.72, w * 0.72, h * 0.60, w * 0.50, h * 0.55);
+
+    ctx.closePath();
+    ctx.stroke();
+
+    // sound hole
+    ctx.beginPath();
+    ctx.arc(w * 0.5, h * 0.73, w * 0.05, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // strings (animated)
+    const baseY = h * 0.58;
+
+    for(let i=0;i<5;i++){
+
+        const offset = playing ? Math.sin(animFrame * 0.3 + i) * 4 : 0;
+
+        ctx.beginPath();
+        ctx.moveTo(w * 0.48, baseY + i * 8);
+        ctx.lineTo(w * 0.58, h * 0.12 + i * 8 + offset);
+        ctx.stroke();
+    }
+
+    if(playing){
+        ctx.fillStyle = "rgba(255,255,255,0.05)";
+        ctx.beginPath();
+        ctx.arc(w*0.5, h*0.73, w*0.25, 0, Math.PI*2);
+        ctx.fill();
+    }
+}
+
+/////////////////////////////////////////////////
+// SOUND (Chord + rhythm)
+/////////////////////////////////////////////////
 
 function playChord(){
 
@@ -189,7 +199,6 @@ function playChord(){
 
     const now = audioCtx.currentTime;
 
-    // 🎼 三個和弦：C / G / Am（簡化版）
     const chords = [
         [261.63, 329.63, 392.00], // C
         [196.00, 246.94, 392.00], // G
@@ -197,6 +206,14 @@ function playChord(){
     ];
 
     const chord = chords[Math.floor(Math.random() * chords.length)];
+
+    const patterns = [
+        [0, 0.10, 0.20, 0.30],
+        [0, 0.07, 0.16, 0.26],
+        [0, 0.05, 0.18, 0.32],
+    ];
+
+    const pattern = patterns[Math.floor(Math.random() * patterns.length)];
 
     chord.forEach((freq, i) => {
 
@@ -206,8 +223,7 @@ function playChord(){
         osc.type = "triangle";
         osc.frequency.value = freq;
 
-        // 🎧 pluck envelope
-        const t = now + i * 0.05;
+        const t = now + pattern[i];
 
         gain.gain.setValueAtTime(0.0001, t);
         gain.gain.exponentialRampToValueAtTime(0.25, t + 0.02);
@@ -220,6 +236,66 @@ function playChord(){
         osc.stop(t + 0.7);
     });
 }
+
+/////////////////////////////////////////////////
+// RUN
+/////////////////////////////////////////////////
+
+function run(){
+
+    const s = getStats();
+    s.r++;
+    saveStats(s);
+    render();
+
+    const canvas = document.getElementById("art");
+    const ctx = canvas.getContext("2d");
+
+    const w = Math.min(window.innerWidth * 0.8, 420);
+    const h = w * 1.3;
+
+    canvas.width = w;
+    canvas.height = h;
+
+    playing = true;
+    animFrame = 0;
+
+    document.getElementById("output").innerText = "playing... 🎸";
+
+    playChord();
+
+    function animate(){
+
+        ctx.clearRect(0,0,w,h);
+
+        drawGuitar(ctx, w, h);
+
+        animFrame++;
+
+        if(animFrame < 60){
+            requestAnimationFrame(animate);
+        } else {
+            playing = false;
+            document.getElementById("output").innerText = "done.";
+        }
+    }
+
+    animate();
+}
+
+/////////////////////////////////////////////////
+// INIT
+/////////////////////////////////////////////////
+
+window.addEventListener("DOMContentLoaded", () => {
+
+    setTimeout(()=>{
+        document.getElementById("introScreen").style.opacity = "0";
+        setTimeout(()=>document.getElementById("introScreen").remove(),500);
+    },1000);
+
+    render();
+});
 
 </script>
 
