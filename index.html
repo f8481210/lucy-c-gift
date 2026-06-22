@@ -1,3 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>20260623 — gift</title>
+
+<style>
+body{
+    margin:0;
+    background:#0b0b0b;
+    color:white;
+    font-family:monospace;
+    display:flex;
+    justify-content:center;
+    padding:30px;
+}
+
+.wrap{
+    width:min(90vw, 420px);
+    text-align:center;
+}
+
+h2{
+    margin-bottom:10px;
+}
+
+.card{
+    margin-top:20px;
+    padding:20px;
+    background:#111;
+    border-radius:18px;
+    cursor:pointer;
+    user-select:none;
+    transition:0.3s;
+}
+
+.card:active{
+    transform:scale(0.98);
+}
+
+/* 🎸 guitar container */
+.guitar{
+    position:relative;
+    height:220px;
+}
+
+/* body */
+.body{
+    position:absolute;
+    left:50%;
+    bottom:10px;
+    transform:translateX(-50%);
+    width:120px;
+    height:120px;
+    border-radius:50%;
+    border:2px solid white;
+    transition:0.2s;
+}
+
+/* neck */
+.neck{
+    position:absolute;
+    left:50%;
+    top:0;
+    transform:translateX(-50%);
+    width:6px;
+    height:110px;
+    background:white;
+}
+
+/* strings */
+.strings{
+    position:absolute;
+    left:50%;
+    top:10px;
+    transform:translateX(-50%);
+    width:2px;
+    height:180px;
+    background:repeating-linear-gradient(
+        to bottom,
+        white,
+        white 3px,
+        transparent 3px,
+        transparent 10px
+    );
+}
+
+/* 🎸 animation */
+.card.playing .body{
+    animation:shake 0.15s infinite;
+}
+
+.card.playing .strings{
+    animation:pluck 0.2s infinite;
+}
+
+@keyframes shake{
+    0%{ transform:translateX(-50%) rotate(-2deg);}
+    50%{ transform:translateX(-50%) rotate(2deg);}
+    100%{ transform:translateX(-50%) rotate(-2deg);}
+}
+
+@keyframes pluck{
+    0%{ transform:translateX(-50%) translateY(0);}
+    50%{ transform:translateX(-50%) translateY(-2px);}
+    100%{ transform:translateX(-50%) translateY(0);}
+}
+
+p{
+    margin-top:15px;
+    color:#aaa;
+    font-size:14px;
+}
+
+.small{
+    color:#777;
+    font-size:12px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="wrap">
+
+    <h2>🎁 20260623</h2>
+    <div class="small">a small interactive gift</div>
+
+    <div class="card" onclick="play()">
+
+        <div class="guitar">
+            <div class="neck"></div>
+            <div class="body"></div>
+            <div class="strings"></div>
+        </div>
+
+        <p>tap to play 🎸</p>
+
+    </div>
+
+</div>
+
 <script>
 
 let audioCtx = null;
@@ -51,3 +193,6 @@ function playPluckSound(){
 }
 
 </script>
+
+</body>
+</html>
